@@ -3,13 +3,13 @@
   "decision": "replace",
   "replacement": {
     "package": "platformdirs",
-    "version_spec": "",
+    "version_spec": ">=4.0.0",
     "stdlib_module": null
   },
-  "rationale": "The appdirs package is stale (STALE_UPSTREAM), with no releases since 2020. platformdirs is the widely accepted, maintained drop-in replacement for appdirs and is fully compatible with Python 3.12.",
+  "rationale": "The 'appdirs' package is stale (STALE_UPSTREAM), with no releases since 2020. 'platformdirs' is the officially recommended, maintained drop-in replacement that provides the same functionality for locating user directories across different platforms and fully supports Python 3.12.",
   "migration_steps": [
-    "Replace appdirs with platformdirs in the dependency manifests (pyproject.toml and requirements.txt).",
-    "Update the import statement in linkwatch/cache.py to use platformdirs instead of appdirs."
+    "Replace 'appdirs' with 'platformdirs' in the project dependency manifests.",
+    "Update the import statement in 'linkwatch/cache.py' to use 'platformdirs' instead of 'appdirs'."
   ],
   "requirement_changes": [
     {
@@ -18,7 +18,7 @@
     },
     {
       "action": "add",
-      "requirement": "platformdirs"
+      "requirement": "platformdirs>=4.0.0"
     }
   ],
   "code_edits": [
@@ -26,21 +26,26 @@
       "file": "linkwatch/cache.py",
       "find": "from appdirs import user_cache_dir",
       "replace": "from platformdirs import user_cache_dir",
-      "why": "Switch from stale appdirs to maintained platformdirs."
+      "why": "Switch from stale 'appdirs' to maintained 'platformdirs'."
     }
   ],
   "suggested_tests": [
     {
-      "name": "test_cache_dir_functionality",
-      "purpose": "Verify that cache_dir still returns a valid path and respects the LINKWATCH_CACHE_DIR environment variable.",
-      "code": "import os\nimport tempfile\nimport pytest\nfrom linkwatch.cache import cache_dir\n\ndef test_cache_dir_env_var(monkeypatch):\n    test_path = os.path.join(tempfile.gettempdir(), \"linkwatch_test_env\")\n    monkeypatch.setenv(\"LINKWATCH_CACHE_DIR\", test_path)\n    assert cache_dir() == test_path\n    assert os.path.exists(test_path)\n\ndef test_cache_dir_default(monkeypatch):\n    monkeypatch.delenv(\"LINKWATCH_CACHE_DIR\", raising=False)\n    path = cache_dir()\n    assert isinstance(path, str)\n    assert os.path.isabs(path)\n    assert os.path.exists(path)"
+      "name": "test_cache_dir_env_override",
+      "purpose": "Ensure that the LINKWATCH_CACHE_DIR environment variable still overrides the default cache directory.",
+      "code": "import os\nimport pytest\nfrom linkwatch.cache import cache_dir\n\ndef test_cache_dir_env_override(monkeypatch):\n    test_path = \"/tmp/linkwatch_test_cache\"\n    monkeypatch.setenv(\"LINKWATCH_CACHE_DIR\", test_path)\n    assert cache_dir() == test_path"
+    },
+    {
+      "name": "test_cache_dir_default",
+      "purpose": "Ensure that cache_dir() returns a valid absolute path when no environment variable is set.",
+      "code": "import os\nfrom linkwatch.cache import cache_dir\n\ndef test_cache_dir_default(monkeypatch):\n    monkeypatch.delenv(\"LINKWATCH_CACHE_DIR\", raising=False)\n    path = cache_dir()\n    assert isinstance(path, str)\n    assert len(path) > 0\n    assert os.path.isabs(path)"
     }
   ],
   "compatibility_notes": [
-    "platformdirs.user_cache_dir is a drop-in replacement for appdirs.user_cache_dir for the usage pattern found in this repository."
+    "platformdirs.user_cache_dir is a drop-in replacement for appdirs.user_cache_dir and behaves identically on Windows, macOS, and Linux."
   ],
   "risks": [
-    "There may be minor differences in the default cache directory paths chosen by platformdirs versus appdirs on some operating systems, which could lead to the application not finding existing caches after the migration."
+    "Minor differences in path resolution on very niche operating systems, though unlikely to affect standard environments."
   ],
   "confidence": 1.0
 }

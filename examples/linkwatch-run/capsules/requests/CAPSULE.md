@@ -40,21 +40,32 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 ## Proposed replacement `AI · VERIFIED`
 
-**None** → `-` (model confidence None)
+**upgrade** → `requests==2.34.2` (model confidence 1.0)
 
+Upgrading requests to the latest version (2.34.2) to resolve the OLD_PIN risk. Additionally, replacing the use of the private API `requests.utils._parse_content_type_header` with the standard library `email.message.Message` and removing the global monkeypatch of `requests.Session.request` in favor of explicit session configuration to improve stability and maintainability.
 
-
+- ✓ package 'requests' exists on PyPI `OBSERVED` latest 2.34.2
 
 ## Migration steps `AI · VERIFIED`
 
+1. Upgrade requests version in pyproject.toml and requirements.txt.
+2. Replace the private API `requests.utils._parse_content_type_header` with `email.message.Message` in `linkwatch/encoding.py`.
+3. Move the User-Agent configuration from the monkeypatch in `linkwatch/http_patch.py` to the `fetch` function in `linkwatch/checker.py`.
+4. Disable the monkeypatch assignment in `linkwatch/http_patch.py`.
 
 Applied edits `MEASURED`:
+- `linkwatch/encoding.py`: applied (exact match) Replace private requests API with standard library equivalent.
+- `linkwatch/encoding.py`: applied (exact match) Use email.message.Message to parse the charset from the Content-Type header.
+- `linkwatch/checker.py`: applied (exact match) Explicitly set the User-Agent on the session instead of relying on a global monkeypatch.
+- `linkwatch/http_patch.py`: applied (exact match) Remove the global monkeypatch to reduce risk.
+- set `requests==2.34.2` in pyproject.toml, requirements.txt
 
 Full patch: [`patch.diff`](patch.diff)
 
 ## Suggested tests `AI-SUGGESTED`
 
-- none
+- `test_user_agent_preserved`: Ensure the User-Agent is still sent as 'linkwatch/1.0' after removing the monkeypatch.
+- `test_encoding_detection_preserved`: Ensure encoding detection still works after replacing the private requests API.
 
 ## Executed test results `MEASURED`
 
@@ -64,18 +75,30 @@ Full patch: [`patch.diff`](patch.diff)
 - Warnings attributed to this dependency: 0 before → 0 after
 - `import requests` in candidate: ok
 
-**Verdict: VERIFIED** — no regressions; every baseline problem attributed to this dependency is resolved
+| Risk indicator | Resolved by this change? | Re-checked on the changed copy |
+|---|---|---|
+| PRIVATE_API | yes | no longer used |
+| MONKEYPATCH | yes | no longer used |
+| OLD_PIN | yes | now 2.34.2 |
+
+| AI-written test | Original dependency | Replacement |
+|---|---|---|
+| `test_encoding_detection_preserved` | passed | passed |
+| `test_user_agent_preserved` | passed | passed |
+
+**Verdict: VERIFIED** — no regressions; resolved PRIVATE_API, MONKEYPATCH, OLD_PIN
 
 ## Compatibility gaps
 
 - `MEASURED` Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)
+- `AI-SUGGESTED` The User-Agent is now set per-session in `fetch()` rather than globally for all `requests.Session` instances.
 
 ## Attempts
 
-- #1 gemma-4-31b-it (google, 278.4s): None → verified
+- #1 gemma-4-31b-it (google, 276.3s): upgrade → verified
 
 ## Open concerns and limitations
 
-- `OBSERVED` No AI-written tests were produced for this dependency.
+- `AI-SUGGESTED` If other parts of the application (not shown in evidence) rely on the global monkeypatch of `requests.Session.request`, they will no longer send the custom User-Agent.
 - `OBSERVED` Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe.
 - `OBSERVED` Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested.

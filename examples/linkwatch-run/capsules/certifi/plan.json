@@ -5,38 +5,38 @@
     "version_spec": null,
     "stdlib_module": null
   },
-  "rationale": "The 'certifi' package is used only to provide the CA bundle path to 'requests' via 'certifi.where()'. However, 'requests' uses 'certifi' by default when 'verify=True' (which is the default behavior). Removing the explicit call and import removes the undeclared dependency risk without changing functionality, as 'requests' already depends on 'certifi' and handles the bundle path internally.",
+  "rationale": "The `certifi` package is used only to provide the CA bundle path to `requests.get()` via `verify=certifi.where()`. However, `requests` already uses `certifi` by default when `verify=True` (which is the default value). Removing the explicit import and call removes the redundant code and resolves the UNDECLARED dependency risk without changing the behavior of the application.",
   "migration_steps": [
-    "Remove the explicit import of 'certifi' in 'linkwatch/checker.py'.",
-    "Remove the 'verify=certifi.where()' argument from the 'session.get' call in 'linkwatch/checker.py', allowing 'requests' to use its default CA bundle."
+    "Remove the explicit import of `certifi` in `linkwatch/checker.py`.",
+    "Remove the `verify=certifi.where()` argument from the `session.get` call in `linkwatch/checker.py`, allowing `requests` to use its default verification behavior."
   ],
   "requirement_changes": [],
   "code_edits": [
     {
       "file": "linkwatch/checker.py",
-      "find": "import certifi\nimport requests",
-      "replace": "import requests",
-      "why": "Remove unused certifi import"
+      "find": "import certifi",
+      "replace": "",
+      "why": "Remove unused import"
     },
     {
       "file": "linkwatch/checker.py",
       "find": "        return session.get(url, verify=certifi.where())",
       "replace": "        return session.get(url)",
-      "why": "Use requests default CA bundle instead of explicitly calling certifi.where()"
+      "why": "requests uses certifi by default for SSL verification"
     }
   ],
   "suggested_tests": [
     {
-      "name": "test_fetch_no_certifi_import",
-      "purpose": "Ensure that fetch still works and doesn't raise ImportError after removing certifi import",
-      "code": "from linkwatch.checker import fetch\nimport pytest\n\ndef test_fetch_no_certifi_import(server):\n    # The server fixture provides an http URL, so SSL verification is not performed,\n    # but this confirms the code executes without ImportError.\n    resp = fetch(server + \"/ok\")\n    assert resp.status_code == 200"
+      "name": "test_fetch_basic",
+      "purpose": "Ensure fetch still works for basic HTTP requests after removing explicit certifi usage",
+      "code": "from linkwatch.checker import fetch\n\ndef test_fetch_basic(server):\n    url = f\"{server}/ok\"\n    resp = fetch(url)\n    assert resp.status_code == 200\n    assert b\"Everything is fine\" in resp.content"
     }
   ],
   "compatibility_notes": [
-    "The code now relies on 'requests' default CA bundle management, which is the standard way to use 'certifi' with 'requests'."
+    "The application will now respect the `REQUESTS_CA_BUNDLE` and `CURL_CA_BUNDLE` environment variables if set, which is the standard behavior for `requests` and generally preferred over forcing the `certifi` bundle."
   ],
   "risks": [
-    "If the environment had a non-standard 'certifi' configuration that 'requests' doesn't pick up automatically, this could theoretically change behavior, but 'certifi.where()' is exactly what 'requests' uses internally."
+    "If the environment has a broken `certifi` installation that `requests` cannot find but `certifi.where()` could somehow resolve, this might fail, but this is extremely unlikely as `requests` depends on `certifi`."
   ],
   "confidence": 1.0
 }

@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -156,9 +156,9 @@
     "provenance": "verified",
     "decision": "upgrade",
     "package": "Jinja2",
-    "version_spec": ">=3.1.0",
+    "version_spec": ">=3.1.6",
     "stdlib_module": null,
-    "rationale": "The current version of Jinja2 (2.11.3) is incompatible with newer versions of MarkupSafe, leading to IMPORT_FAILS and TEST_FAILURES (ImportError: cannot import name 'soft_unicode' from 'markupsafe'). Upgrading to Jinja2 3.x resolves this issue and provides support for Python 3.12.",
+    "rationale": "The repository is experiencing critical IMPORT_FAILS and TEST_FAILURES because Jinja2 2.11.3 is incompatible with newer versions of its dependency, markupsafe (which removed 'soft_unicode' in version 2.1.0). Upgrading to Jinja2 3.1.6 resolves this incompatibility and brings the dependency up to date.",
     "model_confidence": 1.0,
     "plan_checks": [
       {
@@ -171,7 +171,7 @@
   "migration_steps": {
     "provenance": "verified",
     "steps": [
-      "Upgrade Jinja2 to >=3.1.0 in pyproject.toml and requirements.txt"
+      "Upgrade Jinja2 to >=3.1.6 in pyproject.toml and requirements.txt to resolve the markupsafe compatibility issue."
     ],
     "code_edits": [],
     "requirement_changes": [
@@ -179,7 +179,7 @@
         "change": {
           "action": "set",
           "package": "Jinja2",
-          "requirement": "Jinja2>=3.1.0"
+          "requirement": "Jinja2>=3.1.6"
         },
         "files": [
           "pyproject.toml",
@@ -194,8 +194,8 @@
     "provenance": "ai",
     "tests": [
       {
-        "name": "test_jinja2_import",
-        "purpose": "Verify that jinja2 and its required components can be imported without the soft_unicode error"
+        "name": "test_jinja2_api_compatibility",
+        "purpose": "Verify that the Jinja2 APIs used in linkwatch/report.py (Environment, FileSystemLoader, select_autoescape) are available and functional in the upgraded version."
       }
     ],
     "file": "tests/test_depexit_jinja2.py",
@@ -205,10 +205,10 @@
     "provenance": "measured",
     "install": {
       "ok": true,
-      "seconds": 0.07,
+      "seconds": 0.08,
       "output": " + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==3.1.6\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
       "pip_check_ok": true,
-      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/jinja2/attempt-1/venv\nChecked 26 packages in 0.79ms\nAll installed packages are compatible"
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/jinja2/attempt-1/venv\nChecked 26 packages in 0.68ms\nAll installed packages are compatible"
     },
     "candidate_versions": {
       "idna": "2.7",
@@ -268,6 +268,26 @@
       "still_failing": {},
       "missing": []
     },
+    "risk_indicators_after_change": [
+      {
+        "id": "IMPORT_FAILS",
+        "severity": "critical",
+        "resolved": true,
+        "detail": "imports cleanly"
+      },
+      {
+        "id": "TEST_FAILURES",
+        "severity": "critical",
+        "resolved": true,
+        "detail": "attributed failures now pass"
+      },
+      {
+        "id": "OUTDATED_PIN",
+        "severity": "medium",
+        "resolved": true,
+        "detail": "now 3.1.6"
+      }
+    ],
     "ai_written_tests": {
       "against_original_dependency": {
         "passed": 0,
@@ -283,7 +303,7 @@
       },
       "per_test": [
         {
-          "test": "test_jinja2_import",
+          "test": "test_jinja2_api_compatibility",
           "original": "error (module failed to import)",
           "replacement": "passed"
         }
@@ -293,23 +313,23 @@
     "warnings_attributed_after": 0,
     "verdict": "verified",
     "verdict_reasons": [
-      "no regressions; every baseline problem attributed to this dependency is resolved"
+      "no regressions; resolved IMPORT_FAILS, TEST_FAILURES, OUTDATED_PIN"
     ]
   },
   "compatibility_gaps": [
     {
       "provenance": "measured",
-      "text": "Behaviour differs: test_jinja2_import error (module failed to import) on the original dependency but passes on the replacement (expected when the original is broken)"
+      "text": "Behaviour differs: test_jinja2_api_compatibility error (module failed to import) on the original dependency but passes on the replacement (expected when the original is broken)"
     },
     {
       "provenance": "ai",
-      "text": "Jinja2 3.x is generally backward compatible with 2.x for the features used in this project (Environment, FileSystemLoader, select_autoescape)."
+      "text": "Jinja2 3.x maintains backward compatibility for the core APIs used in this project (Environment, FileSystemLoader, and select_autoescape)."
     }
   ],
   "open_concerns": [
     {
       "provenance": "ai",
-      "text": "Potential changes in template rendering behavior between Jinja2 2.11 and 3.1, although unlikely for basic usage."
+      "text": "While the Python API is stable, there is a small risk that existing .j2 templates might behave differently under Jinja2 3.x, although the usage here appears to be basic variable interpolation."
     },
     {
       "provenance": "observed",
@@ -325,11 +345,11 @@
       "attempt": 1,
       "model": "gemma-4-31b-it",
       "backend": "google",
-      "seconds": 92.4,
+      "seconds": 203.7,
       "decision": "upgrade",
       "verdict": "verified",
       "reasons": [
-        "no regressions; every baseline problem attributed to this dependency is resolved"
+        "no regressions; resolved IMPORT_FAILS, TEST_FAILURES, OUTDATED_PIN"
       ]
     }
   ]

@@ -34,25 +34,25 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 **remove** → `importlib.resources` (model confidence 1.0)
 
-The package uses `pkg_resources` to locate templates, which is deprecated (DEPRECATION_WARNINGS). The modern standard library replacement is `importlib.resources`. Since `setuptools` is only used for this purpose at runtime, it can be removed from the runtime dependencies.
+The repository uses `pkg_resources` from `setuptools` to locate package resources, which is deprecated (DEPRECATION_WARNINGS). In Python 3.9+, `importlib.resources` is the standard library replacement. Since the target Python version is 3.12.14, we can replace `pkg_resources` with `importlib.resources` and remove `setuptools` as a runtime dependency.
 
 - ✓ 'importlib.resources' is a standard-library module `OBSERVED` 
 
 ## Migration steps `AI · VERIFIED`
 
-1. Replace `pkg_resources.resource_filename` with `importlib.resources.files().joinpath()` in `linkwatch/resources.py`.
-2. Remove `setuptools` from the runtime dependencies in `pyproject.toml` and `requirements.txt`.
+1. Replace `pkg_resources` imports and calls with `importlib.resources` in `linkwatch/resources.py`.
+2. Remove `setuptools` from `pyproject.toml` and `requirements.txt` runtime dependencies.
 
 Applied edits `MEASURED`:
-- `linkwatch/resources.py`: applied (exact match) Replace deprecated pkg_resources with stdlib importlib.resources
-- `linkwatch/resources.py`: applied (exact match) Use the modern importlib.resources.files API to locate the templates directory
+- `linkwatch/resources.py`: applied (exact match) Replace deprecated pkg_resources with standard library importlib.resources
+- `linkwatch/resources.py`: applied (exact match) Replace pkg_resources.resource_filename with the modern importlib.resources.files API
 - remove `setuptools` in pyproject.toml, requirements.txt
 
 Full patch: [`patch.diff`](patch.diff)
 
 ## Suggested tests `AI-SUGGESTED`
 
-- `test_template_dir_is_valid`: Ensure template_dir() still returns a valid path to the templates directory
+- `test_template_dir_is_valid`: Verify that template_dir() still returns a valid path to the templates directory
 
 ## Executed test results `MEASURED`
 
@@ -62,23 +62,28 @@ Full patch: [`patch.diff`](patch.diff)
 - Warnings attributed to this dependency: 1 before → 0 after
 - `import importlib` in candidate: ok
 
+| Risk indicator | Resolved by this change? | Re-checked on the changed copy |
+|---|---|---|
+| DEPRECATION_WARNINGS | yes | 0 attributed warning(s) left |
+| OUTDATED_PIN | yes | package no longer used |
+
 | AI-written test | Original dependency | Replacement |
 |---|---|---|
 | `test_template_dir_is_valid` | passed | passed |
 
-**Verdict: VERIFIED** — no regressions; every baseline problem attributed to this dependency is resolved
+**Verdict: VERIFIED** — no regressions; resolved DEPRECATION_WARNINGS, OUTDATED_PIN
 
 ## Compatibility gaps
 
 - `MEASURED` Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)
-- `AI-SUGGESTED` importlib.resources.files was introduced in Python 3.9, which is compatible with the project's >=3.10 requirement.
+- `AI-SUGGESTED` importlib.resources.files().joinpath() returns a Traversable object; converting it to str() ensures compatibility with code expecting a string path, matching the behavior of pkg_resources.resource_filename.
 
 ## Attempts
 
-- #1 gemma-4-31b-it (google, 173.5s): remove → verified
+- #1 gemma-4-31b-it (google, 114.0s): remove → verified
 
 ## Open concerns and limitations
 
-- `AI-SUGGESTED` If the package is installed in a non-standard way (e.g., as a zip file), importlib.resources.files().joinpath() might return a Traversable object that doesn't resolve to a physical filesystem path via str(). However, for standard pip installations, this is the correct replacement for resource_filename.
+- `AI-SUGGESTED` If the package is installed in a non-standard way (e.g., some very specific zip-safe configurations), importlib.resources might behave differently than pkg_resources, although it is the officially recommended replacement.
 - `OBSERVED` Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe.
 - `OBSERVED` Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested.

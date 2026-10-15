@@ -27,26 +27,24 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 ## Proposed replacement `AI · VERIFIED`
 
-**upgrade** → `Jinja2>=3.1.2` (model confidence 1.0)
+**upgrade** → `Jinja2==3.1.4` (model confidence 0.9)
 
-The observed 'ImportError: cannot import name 'soft_unicode' from 'markupsafe'' is a known incompatibility between Jinja2 versions prior to 3.0 and MarkupSafe versions 2.1.0 and later. The repository is currently pinned to Jinja2 2.11.3, while the environment has MarkupSafe 3.0.4. Upgrading Jinja2 to >= 3.1.2 resolves this issue and ensures compatibility with Python 3.12.
+The failure 'ImportError: cannot import name 'soft_unicode' from 'markupsafe'' is a known incompatibility between Jinja2 < 3.0 and MarkupSafe >= 2.1.0. MarkupSafe removed 'soft_unicode' in version 2.1.0. Since the project is pinned to Jinja2 2.11.3 and the environment has resolved MarkupSafe to 3.0.4, the tests fail. To resolve this on Python 3.12, we must upgrade Jinja2 to 3.1.4, as pinning MarkupSafe to a version < 2.1.0 (which still provides 'soft_unicode') would likely cause installation failures on Python 3.12 due to C API incompatibilities.
 
 - ✓ package 'Jinja2' exists on PyPI `OBSERVED` latest 3.1.6
 
 ## Migration steps `AI · VERIFIED`
 
-1. Upgrade Jinja2 to >= 3.1.2 in pyproject.toml and requirements.txt to resolve the incompatibility with MarkupSafe 3.0.4.
+1. Upgrade Jinja2 from 2.11.3 to 3.1.4 in pyproject.toml and requirements.txt to ensure compatibility with the installed version of MarkupSafe (3.0.4).
 
 Applied edits `MEASURED`:
-- `pyproject.toml`: applied (exact match) Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12.
-- `requirements.txt`: applied (exact match) Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12.
-- set `Jinja2>=3.1.2` in pyproject.toml, requirements.txt
+- set `Jinja2==3.1.4` in pyproject.toml, requirements.txt
 
 Full patch: [`patch.diff`](patch.diff)
 
 ## Suggested tests `AI-SUGGESTED`
 
-- `test_jinja2_basic_rendering`: Verify that Jinja2 still renders basic templates correctly after the upgrade.
+- `test_jinja2_markupsafe_compatibility`: Verify that Jinja2 can render a template and MarkupSafe is functional without relying on soft_unicode
 
 ## Executed test results `MEASURED`
 
@@ -57,23 +55,28 @@ Full patch: [`patch.diff`](patch.diff)
 - `import jinja2` in candidate: ok
 - `import markupsafe` in candidate: ok
 
+| Risk indicator | Resolved by this change? | Re-checked on the changed copy |
+|---|---|---|
+| TEST_FAILURES | yes | attributed failures now pass |
+| TRANSITIVE_BREAKAGE | yes | attributed failures now pass |
+
 | AI-written test | Original dependency | Replacement |
 |---|---|---|
-| `test_jinja2_basic_rendering` | error (module failed to import) | passed |
+| `test_jinja2_markupsafe_compatibility` | error (module failed to import) | passed |
 
-**Verdict: VERIFIED** — no regressions; every baseline problem attributed to this dependency is resolved
+**Verdict: VERIFIED** — no regressions; resolved TEST_FAILURES, TRANSITIVE_BREAKAGE
 
 ## Compatibility gaps
 
-- `MEASURED` Behaviour differs: test_jinja2_basic_rendering error (module failed to import) on the original dependency but passes on the replacement (expected when the original is broken)
-- `AI-SUGGESTED` Jinja2 3.x is generally backward compatible with 2.x for basic template rendering, which is the primary use case in this repository.
+- `MEASURED` Behaviour differs: test_jinja2_markupsafe_compatibility error (module failed to import) on the original dependency but passes on the replacement (expected when the original is broken)
+- `AI-SUGGESTED` Upgrading Jinja2 from 2.11 to 3.1 is generally backward compatible for basic template rendering, but some internal APIs may have changed.
 
 ## Attempts
 
-- #1 gemma-4-31b-it (google, 557.8s): upgrade → verified
+- #1 gemma-4-31b-it (google, 293.5s): upgrade → verified
 
 ## Open concerns and limitations
 
-- `AI-SUGGESTED` While basic rendering is stable, any advanced Jinja2 2.11 specific internal APIs used by the project (though none were found in the AST scan) might have changed in 3.x.
+- `AI-SUGGESTED` Potential breaking changes in Jinja2 3.x templates, although unlikely for the simple HTML reports used in this project.
 - `OBSERVED` Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe.
 - `OBSERVED` Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested.

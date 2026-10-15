@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -30,12 +30,12 @@
     "install_error": "",
     "pip_check": {
       "ok": true,
-      "output": "Using Python 3.12.14 environment at: capsule-out/work/venv-baseline\nChecked 26 packages in 1ms\nAll installed packages are compatible"
+      "output": "Using Python 3.12.14 environment at: capsule-out/work/venv-baseline\nChecked 26 packages in 0.92ms\nAll installed packages are compatible"
     },
     "tests": {
       "label": "baseline",
       "exit_code": 1,
-      "seconds": 8.9,
+      "seconds": 9.06,
       "cases": [
         {
           "id": "tests/test_cache.py::test_cache_round_trip",
@@ -49,7 +49,7 @@
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.01
+          "seconds": 0.014
         },
         {
           "id": "tests/test_checker.py::test_missing_is_down",
@@ -77,7 +77,7 @@
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.005
+          "seconds": 0.004
         },
         {
           "id": "tests/test_checker.py::test_latin1_title",
@@ -91,7 +91,7 @@
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.004
+          "seconds": 0.003
         },
         {
           "id": "tests/test_config.py::test_sites_file_loads",
@@ -104,8 +104,8 @@
           "id": "tests/test_report.py::test_report_renders_all_sites",
           "outcome": "failed",
           "message": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)",
-          "detail": "tmp_path = PosixPath('/private/var/folders/4b/k1y8dkl13kldn72b0_pqfgv00000gn/T/pytest-of-shubhamkumar/pytest-7/test_report_renders_all_sites0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1098ee510>\n\n    def test_report_renders_all_sites(tmp_path, monkeypatch):\n        monkeypatch.setenv(\"LINKWATCH_CACHE_DIR\", str(tmp_path))\n        cache.save_results(RESULTS)\n        output = tmp_path / \"status.html\"\n>       result = CliRunner().invoke(cli, [\"report\", \"-o\", str(output)], catch_exceptions=False)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_report.py:20: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n../venv-baseline/lib/python3.12/site-packages/click/testing.py:687: in invoke\n    return_value = cli.main(args=args or (), prog_name=prog_name, **extra)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:1552: in main\n    rv = self.invoke(ctx)\n         ^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:2032: in invoke\n    return _process_result(sub_ctx.command.invoke(sub_ctx))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:1415: in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:910: in invoke\n    return callback(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nlinkwatch/cli.py:56: in report\n    from .report import render_report\nlinkwatch/report.py:3: in <module>\n    from jinja2 import Environment, FileSystemLoader, select_autoescape\n../venv-baseline/lib/python3.12/site-packages/jinja2/__init__.py:12: in <module>\n    from .environment import Environment\n../venv-baseline/lib/python3.12/site-packages/jinja2/environment.py:25: in <module>\n    from .defaults import BLOCK_END_STRING\n../venv-baseline/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError",
-          "seconds": 0.393
+          "detail": "tmp_path = PosixPath('/private/var/folders/4b/k1y8dkl13kldn72b0_pqfgv00000gn/T/pytest-of-shubhamkumar/pytest-20/test_report_renders_all_sites0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107e42000>\n\n    def test_report_renders_all_sites(tmp_path, monkeypatch):\n        monkeypatch.setenv(\"LINKWATCH_CACHE_DIR\", str(tmp_path))\n        cache.save_results(RESULTS)\n        output = tmp_path / \"status.html\"\n>       result = CliRunner().invoke(cli, [\"report\", \"-o\", str(output)], catch_exceptions=False)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_report.py:20: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n../venv-baseline/lib/python3.12/site-packages/click/testing.py:687: in invoke\n    return_value = cli.main(args=args or (), prog_name=prog_name, **extra)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:1552: in main\n    rv = self.invoke(ctx)\n         ^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:2032: in invoke\n    return _process_result(sub_ctx.command.invoke(sub_ctx))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:1415: in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-baseline/lib/python3.12/site-packages/click/core.py:910: in invoke\n    return callback(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nlinkwatch/cli.py:56: in report\n    from .report import render_report\nlinkwatch/report.py:3: in <module>\n    from jinja2 import Environment, FileSystemLoader, select_autoescape\n../venv-baseline/lib/python3.12/site-packages/jinja2/__init__.py:12: in <module>\n    from .environment import Environment\n../venv-baseline/lib/python3.12/site-packages/jinja2/environment.py:25: in <module>\n    from .defaults import BLOCK_END_STRING\n../venv-baseline/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError",
+          "seconds": 0.881
         }
       ],
       "warnings": [
@@ -117,7 +117,7 @@
         }
       ],
       "collection_error": "",
-      "output_tail": "../venv-baseline/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...\n1 failed, 9 passed, 1 warning in 6.56s",
+      "output_tail": "../venv-baseline/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...\n1 failed, 9 passed, 1 warning in 7.07s",
       "counts": {
         "passed": 9,
         "failed": 1,
@@ -163,7 +163,7 @@
       "tests": {
         "label": "pyproject-install",
         "exit_code": 1,
-        "seconds": 8.67,
+        "seconds": 8.68,
         "cases": [
           {
             "id": "tests/test_cache.py::test_cache_round_trip",
@@ -177,14 +177,14 @@
             "outcome": "passed",
             "message": "",
             "detail": "",
-            "seconds": 0.021
+            "seconds": 0.011
           },
           {
             "id": "tests/test_checker.py::test_missing_is_down",
             "outcome": "passed",
             "message": "",
             "detail": "",
-            "seconds": 0.002
+            "seconds": 0.001
           },
           {
             "id": "tests/test_checker.py::test_redirect_is_up",
@@ -198,7 +198,7 @@
             "outcome": "passed",
             "message": "",
             "detail": "",
-            "seconds": 6.01
+            "seconds": 6.009
           },
           {
             "id": "tests/test_checker.py::test_closed_port_is_down",
@@ -212,28 +212,28 @@
             "outcome": "passed",
             "message": "",
             "detail": "",
-            "seconds": 0.012
+            "seconds": 0.01
           },
           {
             "id": "tests/test_checker.py::test_user_agent",
             "outcome": "passed",
             "message": "",
             "detail": "",
-            "seconds": 0.005
+            "seconds": 0.006
           },
           {
             "id": "tests/test_config.py::test_sites_file_loads",
             "outcome": "passed",
             "message": "",
             "detail": "",
-            "seconds": 0.001
+            "seconds": 0.002
           },
           {
             "id": "tests/test_report.py::test_report_renders_all_sites",
             "outcome": "failed",
             "message": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)",
-            "detail": "tmp_path = PosixPath('/private/var/folders/4b/k1y8dkl13kldn72b0_pqfgv00000gn/T/pytest-of-shubhamkumar/pytest-8/test_report_renders_all_sites0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1082f6ae0>\n\n    def test_report_renders_all_sites(tmp_path, monkeypatch):\n        monkeypatch.setenv(\"LINKWATCH_CACHE_DIR\", str(tmp_path))\n        cache.save_results(RESULTS)\n        output = tmp_path / \"status.html\"\n>       result = CliRunner().invoke(cli, [\"report\", \"-o\", str(output)], catch_exceptions=False)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_report.py:20: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n../venv-pyproject/lib/python3.12/site-packages/click/testing.py:687: in invoke\n    return_value = cli.main(args=args or (), prog_name=prog_name, **extra)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:1552: in main\n    rv = self.invoke(ctx)\n         ^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:2032: in invoke\n    return _process_result(sub_ctx.command.invoke(sub_ctx))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:1415: in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:910: in invoke\n    return callback(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nlinkwatch/cli.py:56: in report\n    from .report import render_report\nlinkwatch/report.py:3: in <module>\n    from jinja2 import Environment, FileSystemLoader, select_autoescape\n../venv-pyproject/lib/python3.12/site-packages/jinja2/__init__.py:12: in <module>\n    from .environment import Environment\n../venv-pyproject/lib/python3.12/site-packages/jinja2/environment.py:25: in <module>\n    from .defaults import BLOCK_END_STRING\n../venv-pyproject/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-pyproject/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-pyproject/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError",
-            "seconds": 0.407
+            "detail": "tmp_path = PosixPath('/private/var/folders/4b/k1y8dkl13kldn72b0_pqfgv00000gn/T/pytest-of-shubhamkumar/pytest-21/test_report_renders_all_sites0')\nmonkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10835f3b0>\n\n    def test_report_renders_all_sites(tmp_path, monkeypatch):\n        monkeypatch.setenv(\"LINKWATCH_CACHE_DIR\", str(tmp_path))\n        cache.save_results(RESULTS)\n        output = tmp_path / \"status.html\"\n>       result = CliRunner().invoke(cli, [\"report\", \"-o\", str(output)], catch_exceptions=False)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ntests/test_report.py:20: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n../venv-pyproject/lib/python3.12/site-packages/click/testing.py:687: in invoke\n    return_value = cli.main(args=args or (), prog_name=prog_name, **extra)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:1552: in main\n    rv = self.invoke(ctx)\n         ^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:2032: in invoke\n    return _process_result(sub_ctx.command.invoke(sub_ctx))\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:1415: in invoke\n    return ctx.invoke(self.callback, **ctx.params)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../venv-pyproject/lib/python3.12/site-packages/click/core.py:910: in invoke\n    return callback(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\nlinkwatch/cli.py:56: in report\n    from .report import render_report\nlinkwatch/report.py:3: in <module>\n    from jinja2 import Environment, FileSystemLoader, select_autoescape\n../venv-pyproject/lib/python3.12/site-packages/jinja2/__init__.py:12: in <module>\n    from .environment import Environment\n../venv-pyproject/lib/python3.12/site-packages/jinja2/environment.py:25: in <module>\n    from .defaults import BLOCK_END_STRING\n../venv-pyproject/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-pyproject/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-pyproject/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError",
+            "seconds": 0.409
           }
         ],
         "warnings": [
@@ -251,7 +251,7 @@
           }
         ],
         "collection_error": "",
-        "output_tail": "=============================== warnings summary ===============================\nlinkwatch/config.py:14\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:14: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    @validator(\"name\")\n\nlinkwatch/config.py:20\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:20: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    @validator(\"url\")\n\nlinkwatch/config.py:7\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:7: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    class Site(BaseModel):\n\n../venv-pyproject/lib/python3.12/site-packages/pydantic/_internal/_config.py:408\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-pyproject/lib/python3.12/site-packages/pydantic/_internal/_config.py:408: UserWarning: Valid config keys have changed in V2:\n  * 'anystr_strip_whitespace' has been renamed to 'str_strip_whitespace'\n    warnings.warn(message, UserWarning)\n\nlinkwatch/config.py:27\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:27: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    class Settings(BaseModel):\n\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...\n1 failed, 9 passed, 6 warnings in 6.58s",
+        "output_tail": "=============================== warnings summary ===============================\nlinkwatch/config.py:14\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:14: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    @validator(\"name\")\n\nlinkwatch/config.py:20\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:20: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    @validator(\"url\")\n\nlinkwatch/config.py:7\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:7: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    class Site(BaseModel):\n\n../venv-pyproject/lib/python3.12/site-packages/pydantic/_internal/_config.py:408\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-pyproject/lib/python3.12/site-packages/pydantic/_internal/_config.py:408: UserWarning: Valid config keys have changed in V2:\n  * 'anystr_strip_whitespace' has been renamed to 'str_strip_whitespace'\n    warnings.warn(message, UserWarning)\n\nlinkwatch/config.py:27\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/config.py:27: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.14/migration/\n    class Settings(BaseModel):\n\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...\n1 failed, 9 passed, 6 warnings in 6.56s",
         "counts": {
           "passed": 9,
           "failed": 1,
@@ -293,7 +293,7 @@
       "score": 90,
       "at_risk": true,
       "status": "verified",
-      "proposal": "upgrade Jinja2>=3.1.0",
+      "proposal": "upgrade Jinja2>=3.1.6",
       "capsule": "capsules/jinja2/capsule.json"
     },
     {
@@ -313,7 +313,7 @@
       "score": 60,
       "at_risk": true,
       "status": "verified",
-      "proposal": "upgrade Jinja2>=3.1.2",
+      "proposal": "upgrade Jinja2==3.1.4",
       "capsule": "capsules/markupsafe/capsule.json"
     },
     {
@@ -323,7 +323,7 @@
       "score": 40,
       "at_risk": true,
       "status": "verified",
-      "proposal": "upgrade pydantic>=2.0",
+      "proposal": "upgrade pydantic>=2",
       "capsule": "capsules/pydantic/capsule.json"
     },
     {
@@ -343,7 +343,7 @@
       "score": 23,
       "at_risk": true,
       "status": "verified",
-      "proposal": "replace platformdirs",
+      "proposal": "replace platformdirs>=4.0.0",
       "capsule": "capsules/appdirs/capsule.json"
     },
     {
@@ -353,7 +353,7 @@
       "score": 23,
       "at_risk": true,
       "status": "verified",
-      "proposal": "None",
+      "proposal": "upgrade requests==2.34.2",
       "capsule": "capsules/requests/capsule.json"
     },
     {
@@ -459,7 +459,7 @@
             "change": {
               "action": "set",
               "package": "Jinja2",
-              "requirement": "Jinja2>=3.1.0"
+              "requirement": "Jinja2>=3.1.6"
             },
             "files": [
               "pyproject.toml",
@@ -490,27 +490,14 @@
       {
         "dependency": "MarkupSafe",
         "edits_applied": 0,
-        "edits_total": 2,
-        "edit_problems": [
-          {
-            "file": "pyproject.toml",
-            "why": "Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12.",
-            "applied": false,
-            "reason": "find text not present in file (model did not copy it exactly)"
-          },
-          {
-            "file": "requirements.txt",
-            "why": "Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12.",
-            "applied": false,
-            "reason": "find text not present in file (model did not copy it exactly)"
-          }
-        ],
+        "edits_total": 0,
+        "edit_problems": [],
         "requirement_changes": [
           {
             "change": {
               "action": "set",
               "package": "Jinja2",
-              "requirement": "Jinja2>=3.1.2"
+              "requirement": "Jinja2==3.1.4"
             },
             "files": [
               "pyproject.toml",
@@ -530,7 +517,7 @@
             "change": {
               "action": "set",
               "package": "pydantic",
-              "requirement": "pydantic>=2.0"
+              "requirement": "pydantic>=2"
             },
             "files": [
               "pyproject.toml",
@@ -579,7 +566,7 @@
           {
             "change": {
               "action": "add",
-              "requirement": "platformdirs"
+              "requirement": "platformdirs>=4.0.0"
             },
             "files": [
               "pyproject.toml",
@@ -591,10 +578,23 @@
       },
       {
         "dependency": "requests",
-        "edits_applied": 0,
-        "edits_total": 0,
+        "edits_applied": 4,
+        "edits_total": 4,
         "edit_problems": [],
-        "requirement_changes": []
+        "requirement_changes": [
+          {
+            "change": {
+              "action": "set",
+              "package": "requests",
+              "requirement": "requests==2.34.2"
+            },
+            "files": [
+              "pyproject.toml",
+              "requirements.txt"
+            ],
+            "applied": true
+          }
+        ]
       },
       {
         "dependency": "setuptools",
@@ -643,11 +643,11 @@
       }
     ],
     "install_ok": true,
-    "install_output": " + idna==3.20\n + iniconfig==2.3.1\n + jinja2==3.1.6\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + packaging==26.3\n + platformdirs==4.13.0\n + pluggy==1.6.0\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + six==1.17.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.8.0",
+    "install_output": " + idna==3.20\n + iniconfig==2.3.1\n + jinja2==3.1.4\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + packaging==26.3\n + platformdirs==4.13.0\n + pluggy==1.6.0\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.34.2\n + rich==15.0.0\n + six==1.17.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.8.0",
     "tests": {
       "label": "combined",
       "exit_code": 0,
-      "seconds": 10.45,
+      "seconds": 8.32,
       "cases": [
         {
           "id": "tests/test_cache.py::test_cache_round_trip",
@@ -661,7 +661,7 @@
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.013
+          "seconds": 0.014
         },
         {
           "id": "tests/test_checker.py::test_missing_is_down",
@@ -675,14 +675,14 @@
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.004
+          "seconds": 0.003
         },
         {
           "id": "tests/test_checker.py::test_slow_is_up",
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 6.008
+          "seconds": 6.01
         },
         {
           "id": "tests/test_checker.py::test_closed_port_is_down",
@@ -696,7 +696,7 @@
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.009
+          "seconds": 0.008
         },
         {
           "id": "tests/test_checker.py::test_user_agent",
@@ -713,7 +713,7 @@
           "seconds": 0.001
         },
         {
-          "id": "tests/test_depexit_appdirs.py::test_cache_dir_env_var",
+          "id": "tests/test_depexit_appdirs.py::test_cache_dir_env_override",
           "outcome": "passed",
           "message": "",
           "detail": "",
@@ -724,28 +724,35 @@
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.001
+          "seconds": 0.002
         },
         {
-          "id": "tests/test_depexit_certifi.py::test_fetch_no_certifi_import",
+          "id": "tests/test_depexit_certifi.py::test_fetch_basic",
           "outcome": "passed",
           "message": "",
           "detail": "",
           "seconds": 0.004
         },
         {
-          "id": "tests/test_depexit_jinja2.py::test_jinja2_import",
+          "id": "tests/test_depexit_idna.py::test_requests_request_init",
           "outcome": "passed",
           "message": "",
           "detail": "",
           "seconds": 0.0
         },
         {
-          "id": "tests/test_depexit_markupsafe.py::test_jinja2_basic_rendering",
+          "id": "tests/test_depexit_jinja2.py::test_jinja2_api_compatibility",
           "outcome": "passed",
           "message": "",
           "detail": "",
           "seconds": 0.002
+        },
+        {
+          "id": "tests/test_depexit_markupsafe.py::test_jinja2_markupsafe_compatibility",
+          "outcome": "passed",
+          "message": "",
+          "detail": "",
+          "seconds": 0.001
         },
         {
           "id": "tests/test_depexit_pydantic.py::test_site_validation",
@@ -755,11 +762,32 @@
           "seconds": 0.001
         },
         {
-          "id": "tests/test_depexit_pydantic.py::test_settings_validation",
+          "id": "tests/test_depexit_pydantic.py::test_site_strip_whitespace",
           "outcome": "passed",
           "message": "",
           "detail": "",
           "seconds": 0.0
+        },
+        {
+          "id": "tests/test_depexit_pydantic.py::test_settings_extra_forbid",
+          "outcome": "passed",
+          "message": "",
+          "detail": "",
+          "seconds": 0.001
+        },
+        {
+          "id": "tests/test_depexit_requests.py::test_user_agent_preserved",
+          "outcome": "passed",
+          "message": "",
+          "detail": "",
+          "seconds": 0.003
+        },
+        {
+          "id": "tests/test_depexit_requests.py::test_encoding_detection_preserved",
+          "outcome": "passed",
+          "message": "",
+          "detail": "",
+          "seconds": 0.007
         },
         {
           "id": "tests/test_depexit_setuptools.py::test_template_dir_is_valid",
@@ -769,25 +797,25 @@
           "seconds": 0.0
         },
         {
-          "id": "tests/test_depexit_toml.py::test_load_settings_migration",
+          "id": "tests/test_depexit_toml.py::test_load_settings_with_tomllib",
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.001
+          "seconds": 0.002
         },
         {
           "id": "tests/test_report.py::test_report_renders_all_sites",
           "outcome": "passed",
           "message": "",
           "detail": "",
-          "seconds": 0.493
+          "seconds": 0.496
         }
       ],
       "warnings": [],
       "collection_error": "",
-      "output_tail": "...................                                                      [100%]\n19 passed in 6.98s",
+      "output_tail": ".......................                                                  [100%]\n23 passed in 6.90s",
       "counts": {
-        "passed": 19,
+        "passed": 23,
         "failed": 0,
         "error": 0,
         "skipped": 0
@@ -798,18 +826,18 @@
       "platformdirs": "4.13.0",
       "packaging": "26.3",
       "Pygments": "2.21.0",
+      "requests": "2.34.2",
       "rich": "15.0.0",
+      "Jinja2": "3.1.4",
       "iniconfig": "2.3.1",
       "pip": "26.2.1",
       "pytest": "9.1.1",
-      "requests": "2.31.0",
       "urllib3": "2.8.0",
       "pydantic_core": "2.50.1",
       "mdurl": "0.1.2",
       "python-dateutil": "2.9.0.post0",
       "chardet": "5.2.0",
       "certifi": "2026.7.22",
-      "Jinja2": "3.1.6",
       "annotated-types": "0.8.0",
       "markdown-it-py": "4.2.0",
       "typing-inspection": "0.4.4",
@@ -834,22 +862,22 @@
       "step": "create-venv",
       "cmd": "uv venv --quiet --seed --python /Users/shubhamkumar/.local/share/uv/python/cpython-3.12-macos-aarch64-none/bin/python3.12 /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline",
       "exit_code": 0,
-      "seconds": 0.06,
+      "seconds": 0.32,
       "output_tail": ""
     },
     {
       "step": "install:baseline",
       "cmd": "uv pip install --python /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -r requirements-dev.txt -r requirements.txt",
       "exit_code": 0,
-      "seconds": 0.05,
+      "seconds": 0.62,
       "output_tail": " + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0"
     },
     {
       "step": "pip-check",
       "cmd": "uv pip check --python /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python",
       "exit_code": 0,
-      "seconds": 0.05,
-      "output_tail": "Using Python 3.12.14 environment at: capsule-out/work/venv-baseline\nChecked 26 packages in 1ms\nAll installed packages are compatible"
+      "seconds": 0.02,
+      "output_tail": "Using Python 3.12.14 environment at: capsule-out/work/venv-baseline\nChecked 26 packages in 0.92ms\nAll installed packages are compatible"
     },
     {
       "step": "inventory",
@@ -862,8 +890,8 @@
       "step": "pytest:baseline",
       "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/evidence/baseline-junit.xml",
       "exit_code": 1,
-      "seconds": 8.9,
-      "output_tail": "    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...\n1 failed, 9 passed, 1 warning in 6.56s"
+      "seconds": 9.06,
+      "output_tail": "    # -*- coding: utf-8 -*-\n    \"\"\"Built-in template filters used with the ``|`` operator.\"\"\"\n    import math\n    import random\n    import re\n    import warnings\n    from collections import namedtuple\n    from itertools import chain\n    from itertools import groupby\n    \n    from markupsafe import escape\n    from markupsafe import Markup\n>   from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n\n../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: ImportError\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/target/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nFAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...\n1 failed, 9 passed, 1 warning in 7.07s"
     },
     {
       "step": "pytest:ai-tests-baseline:jinja2",
@@ -873,46 +901,60 @@
       "output_tail": "/Users/shubhamkumar/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_depexit_jinja2.py:2: in <module>\n    import jinja2\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/__init__.py:12: in <module>\n    from .environment import Environment\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/environment.py:25: in <module>\n    from .defaults import BLOCK_END_STRING\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: in <module>\n    from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/jinja2/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/test_depexit_jinja2.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.09s"
     },
     {
-      "step": "pytest:ai-tests-baseline:pydantic",
-      "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/pydantic/attempt-1/ai-baseline-junit.xml tests/test_depexit_pydantic.py",
-      "exit_code": 0,
-      "seconds": 0.3,
-      "output_tail": "..                                                                       [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/pydantic/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n2 passed, 1 warning in 0.01s"
+      "step": "pytest:ai-tests-baseline:markupsafe",
+      "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/markupsafe/attempt-1/ai-baseline-junit.xml tests/test_depexit_markupsafe.py",
+      "exit_code": 2,
+      "seconds": 0.37,
+      "output_tail": "/Users/shubhamkumar/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_depexit_markupsafe.py:2: in <module>\n    import jinja2\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/__init__.py:12: in <module>\n    from .environment import Environment\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/environment.py:25: in <module>\n    from .defaults import BLOCK_END_STRING\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: in <module>\n    from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/markupsafe/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/test_depexit_markupsafe.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.09s"
     },
     {
       "step": "pytest:ai-tests-baseline:toml",
       "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/toml/attempt-1/ai-baseline-junit.xml tests/test_depexit_toml.py",
       "exit_code": 0,
-      "seconds": 0.29,
+      "seconds": 0.28,
       "output_tail": ".                                                                        [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/toml/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n1 passed, 1 warning in 0.01s"
-    },
-    {
-      "step": "pytest:ai-tests-baseline:markupsafe",
-      "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/markupsafe/attempt-1/ai-baseline-junit.xml tests/test_depexit_markupsafe.py",
-      "exit_code": 2,
-      "seconds": 0.42,
-      "output_tail": "/Users/shubhamkumar/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_depexit_markupsafe.py:3: in <module>\n    from jinja2 import Template\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/__init__.py:12: in <module>\n    from .environment import Environment\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/environment.py:25: in <module>\n    from .defaults import BLOCK_END_STRING\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/defaults.py:3: in <module>\n    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n../../../../venv-baseline/lib/python3.12/site-packages/jinja2/filters.py:13: in <module>\n    from markupsafe import soft_unicode\nE   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/lib/python3.12/site-packages/markupsafe/__init__.py)\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/markupsafe/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nERROR tests/test_depexit_markupsafe.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 warning, 1 error in 0.10s"
     },
     {
       "step": "pytest:ai-tests-baseline:appdirs",
       "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/appdirs/attempt-1/ai-baseline-junit.xml tests/test_depexit_appdirs.py",
       "exit_code": 0,
-      "seconds": 0.32,
+      "seconds": 0.26,
       "output_tail": "..                                                                       [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/appdirs/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n2 passed, 1 warning in 0.01s"
+    },
+    {
+      "step": "pytest:ai-tests-baseline:pydantic",
+      "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/pydantic/attempt-1/ai-baseline-junit.xml tests/test_depexit_pydantic.py",
+      "exit_code": 0,
+      "seconds": 0.28,
+      "output_tail": "...                                                                      [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/pydantic/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 1 warning in 0.01s"
     },
     {
       "step": "pytest:ai-tests-baseline:setuptools",
       "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/setuptools/attempt-1/ai-baseline-junit.xml tests/test_depexit_setuptools.py",
       "exit_code": 0,
-      "seconds": 0.29,
+      "seconds": 0.3,
       "output_tail": ".                                                                        [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/setuptools/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n1 passed, 1 warning in 0.01s"
+    },
+    {
+      "step": "pytest:ai-tests-baseline:idna",
+      "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/idna/attempt-1/ai-baseline-junit.xml tests/test_depexit_idna.py",
+      "exit_code": 0,
+      "seconds": 0.28,
+      "output_tail": ".                                                                        [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/idna/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n1 passed, 1 warning in 0.01s"
+    },
+    {
+      "step": "pytest:ai-tests-baseline:requests",
+      "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/requests/attempt-1/ai-baseline-junit.xml tests/test_depexit_requests.py",
+      "exit_code": 0,
+      "seconds": 0.84,
+      "output_tail": "..                                                                       [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/requests/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n2 passed, 1 warning in 0.52s"
     },
     {
       "step": "pytest:ai-tests-baseline:certifi",
       "cmd": "/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/venv-baseline/bin/python -m pytest -q -rfE -p no:cacheprovider -W default --junitxml=/Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/certifi/attempt-1/ai-baseline-junit.xml tests/test_depexit_certifi.py",
       "exit_code": 0,
-      "seconds": 0.85,
-      "output_tail": ".                                                                        [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/certifi/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n1 passed, 1 warning in 0.51s"
+      "seconds": 0.82,
+      "output_tail": ".                                                                        [100%]\n=============================== warnings summary ===============================\nlinkwatch/resources.py:1\n  /Users/shubhamkumar/H26_404_TeamNotFound_xyz/capsule-out/work/candidates/certifi/attempt-1/baseline-with-ai-tests/linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html\n    import pkg_resources\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n1 passed, 1 warning in 0.52s"
     }
   ]
 }

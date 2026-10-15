@@ -3,33 +3,33 @@
   "decision": "upgrade",
   "replacement": {
     "package": "Jinja2",
-    "version_spec": ">=3.1.0",
+    "version_spec": ">=3.1.6",
     "stdlib_module": null
   },
-  "rationale": "The current version of Jinja2 (2.11.3) is incompatible with newer versions of MarkupSafe, leading to IMPORT_FAILS and TEST_FAILURES (ImportError: cannot import name 'soft_unicode' from 'markupsafe'). Upgrading to Jinja2 3.x resolves this issue and provides support for Python 3.12.",
+  "rationale": "The repository is experiencing critical IMPORT_FAILS and TEST_FAILURES because Jinja2 2.11.3 is incompatible with newer versions of its dependency, markupsafe (which removed 'soft_unicode' in version 2.1.0). Upgrading to Jinja2 3.1.6 resolves this incompatibility and brings the dependency up to date.",
   "migration_steps": [
-    "Upgrade Jinja2 to >=3.1.0 in pyproject.toml and requirements.txt"
+    "Upgrade Jinja2 to >=3.1.6 in pyproject.toml and requirements.txt to resolve the markupsafe compatibility issue."
   ],
   "requirement_changes": [
     {
       "action": "set",
       "package": "Jinja2",
-      "requirement": "Jinja2>=3.1.0"
+      "requirement": "Jinja2>=3.1.6"
     }
   ],
   "code_edits": [],
   "suggested_tests": [
     {
-      "name": "test_jinja2_import",
-      "purpose": "Verify that jinja2 and its required components can be imported without the soft_unicode error",
-      "code": "import jinja2\nfrom jinja2 import Environment, FileSystemLoader, select_autoescape\n\ndef test_jinja2_import():\n    assert Environment is not None\n    assert FileSystemLoader is not None\n    assert select_autoescape is not None"
+      "name": "test_jinja2_api_compatibility",
+      "purpose": "Verify that the Jinja2 APIs used in linkwatch/report.py (Environment, FileSystemLoader, select_autoescape) are available and functional in the upgraded version.",
+      "code": "import jinja2\nfrom jinja2 import Environment, FileSystemLoader, select_autoescape\nimport pytest\n\ndef test_jinja2_api_compatibility():\n    \"\"\"Verify that the Jinja2 APIs used in linkwatch/report.py are available and functional.\"\"\"\n    try:\n        env = Environment(\n            loader=FileSystemLoader('.'),\n            autoescape=select_autoescape([\"html\", \"j2\"]),\n        )\n        template = env.from_string(\"Test: {{ value }}\")\n        result = template.render(value=\"success\")\n        assert result == \"Test: success\"\n    except ImportError as e:\n        pytest.fail(f\"Jinja2 API import failed: {e}\")\n    except Exception as e:\n        pytest.fail(f\"Jinja2 execution failed: {e}\")"
     }
   ],
   "compatibility_notes": [
-    "Jinja2 3.x is generally backward compatible with 2.x for the features used in this project (Environment, FileSystemLoader, select_autoescape)."
+    "Jinja2 3.x maintains backward compatibility for the core APIs used in this project (Environment, FileSystemLoader, and select_autoescape)."
   ],
   "risks": [
-    "Potential changes in template rendering behavior between Jinja2 2.11 and 3.1, although unlikely for basic usage."
+    "While the Python API is stable, there is a small risk that existing .j2 templates might behave differently under Jinja2 3.x, although the usage here appears to be basic variable interpolation."
   ],
   "confidence": 1.0
 }

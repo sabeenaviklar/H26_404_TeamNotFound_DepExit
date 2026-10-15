@@ -1,52 +1,36 @@
-
-
---- retry ---
 ```json
 {
   "decision": "upgrade",
   "replacement": {
     "package": "Jinja2",
-    "version_spec": ">=3.1.2",
+    "version_spec": "==3.1.4",
     "stdlib_module": null
   },
-  "rationale": "The observed 'ImportError: cannot import name 'soft_unicode' from 'markupsafe'' is a known incompatibility between Jinja2 versions prior to 3.0 and MarkupSafe versions 2.1.0 and later. The repository is currently pinned to Jinja2 2.11.3, while the environment has MarkupSafe 3.0.4. Upgrading Jinja2 to >= 3.1.2 resolves this issue and ensures compatibility with Python 3.12.",
+  "rationale": "The failure 'ImportError: cannot import name 'soft_unicode' from 'markupsafe'' is a known incompatibility between Jinja2 < 3.0 and MarkupSafe >= 2.1.0. MarkupSafe removed 'soft_unicode' in version 2.1.0. Since the project is pinned to Jinja2 2.11.3 and the environment has resolved MarkupSafe to 3.0.4, the tests fail. To resolve this on Python 3.12, we must upgrade Jinja2 to 3.1.4, as pinning MarkupSafe to a version < 2.1.0 (which still provides 'soft_unicode') would likely cause installation failures on Python 3.12 due to C API incompatibilities.",
   "migration_steps": [
-    "Upgrade Jinja2 to >= 3.1.2 in pyproject.toml and requirements.txt to resolve the incompatibility with MarkupSafe 3.0.4."
+    "Upgrade Jinja2 from 2.11.3 to 3.1.4 in pyproject.toml and requirements.txt to ensure compatibility with the installed version of MarkupSafe (3.0.4)."
   ],
   "requirement_changes": [
     {
       "action": "set",
       "package": "Jinja2",
-      "requirement": "Jinja2>=3.1.2"
+      "requirement": "Jinja2==3.1.4"
     }
   ],
-  "code_edits": [
-    {
-      "file": "pyproject.toml",
-      "find": "\"Jinja2==2.11.3\",",
-      "replace": "\"Jinja2>=3.1.2\",",
-      "why": "Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12."
-    },
-    {
-      "file": "requirements.txt",
-      "find": "Jinja2==2.11.3",
-      "replace": "Jinja2>=3.1.2",
-      "why": "Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12."
-    }
-  ],
+  "code_edits": [],
   "suggested_tests": [
     {
-      "name": "test_jinja2_basic_rendering",
-      "purpose": "Verify that Jinja2 still renders basic templates correctly after the upgrade.",
-      "code": "import pytest\nfrom jinja2 import Template\n\ndef test_jinja2_basic_rendering():\n    template = Template(\"Hello {{ name }}!\")\n    result = template.render(name=\"World\")\n    assert result == \"Hello World!\""
+      "name": "test_jinja2_markupsafe_compatibility",
+      "purpose": "Verify that Jinja2 can render a template and MarkupSafe is functional without relying on soft_unicode",
+      "code": "import jinja2\nfrom markupsafe import Markup\n\ndef test_jinja2_markupsafe_compatibility():\n    template = jinja2.Template('Hello {{ name }}!')\n    assert template.render(name='World') == 'Hello World!'\n    assert str(Markup('<b>Bold</b>')) == '<b>Bold</b>'"
     }
   ],
   "compatibility_notes": [
-    "Jinja2 3.x is generally backward compatible with 2.x for basic template rendering, which is the primary use case in this repository."
+    "Upgrading Jinja2 from 2.11 to 3.1 is generally backward compatible for basic template rendering, but some internal APIs may have changed."
   ],
   "risks": [
-    "While basic rendering is stable, any advanced Jinja2 2.11 specific internal APIs used by the project (though none were found in the AST scan) might have changed in 3.x."
+    "Potential breaking changes in Jinja2 3.x templates, although unlikely for the simple HTML reports used in this project."
   ],
-  "confidence": 1.0
+  "confidence": 0.9
 }
 ```

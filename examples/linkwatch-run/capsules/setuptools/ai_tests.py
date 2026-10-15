@@ -4,8 +4,5 @@ from linkwatch.resources import template_dir
 
 def test_template_dir_is_valid():
     path = template_dir()
-    assert isinstance(path, str)
     assert os.path.isdir(path)
-    # Check if the expected template file exists in that directory
-    from linkwatch.resources import TEMPLATE_NAME
-    assert os.path.exists(os.path.join(path, TEMPLATE_NAME))
+    assert path.endswith('templates')

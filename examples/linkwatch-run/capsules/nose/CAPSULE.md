@@ -31,17 +31,17 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 **remove** → `-` (model confidence 1.0)
 
-The 'nose' package is incompatible with Python 3.12 because it relies on the 'imp' module, which was removed in this Python version (IMPORT_FAILS). Additionally, 'nose' is STALE_UPSTREAM with no releases since 2015. The repository already uses 'pytest' as its primary test runner (as seen in the 'test' target of the Makefile and 'requirements-dev.txt'), making 'nose' redundant.
+The 'nose' package is broken on Python 3.12 because it relies on the 'imp' module, which was removed in this Python version (IMPORT_FAILS). Furthermore, 'nose' is unmaintained (STALE_UPSTREAM) and redundant since 'pytest' is already a declared dependency and used as the primary test runner in the Makefile.
 
 
 ## Migration steps `AI · VERIFIED`
 
-1. Remove 'nose' from 'requirements-dev.txt'.
-2. Remove the 'test-nose' target and its reference in '.PHONY' from the 'Makefile'.
+1. Remove 'nose' from requirements-dev.txt
+2. Remove the 'test-nose' target from the Makefile
 
 Applied edits `MEASURED`:
-- `Makefile`: applied (exact match) Remove test-nose from the list of phony targets.
-- `Makefile`: applied (exact match) Remove the redundant and broken nose test target.
+- `Makefile`: applied (exact match) Remove test-nose from phony targets
+- `Makefile`: applied (exact match) Remove the broken and redundant nose test target
 - remove `nose` in requirements-dev.txt
 
 Full patch: [`patch.diff`](patch.diff)
@@ -57,20 +57,26 @@ Full patch: [`patch.diff`](patch.diff)
 - Fixed: none; regressions: none
 - Warnings attributed to this dependency: 0 before → 0 after
 
-**Verdict: VERIFIED** — no regressions; every baseline problem attributed to this dependency is resolved
+| Risk indicator | Resolved by this change? | Re-checked on the changed copy |
+|---|---|---|
+| IMPORT_FAILS | yes | imports cleanly |
+| TOOLING_ONLY | n/a | informational |
+| STALE_UPSTREAM | yes | package no longer used |
+| OLD_PIN | yes | package no longer used |
+
+**Verdict: VERIFIED** — no regressions; resolved IMPORT_FAILS, STALE_UPSTREAM, OLD_PIN
 
 ## Compatibility gaps
 
 - `MEASURED` Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)
-- `AI-SUGGESTED` The 'test-nose' Makefile target is removed. Users should use 'make test' which runs pytest.
+- `AI-SUGGESTED` The project already uses pytest for its main 'test' target, so removing nose does not affect the primary testing workflow.
 
 ## Attempts
 
-- #1 gemma-4-31b-it (google, 176.2s): remove → verified
+- #1 gemma-4-31b-it (google, 145.7s): remove → verified
 
 ## Open concerns and limitations
 
-- `AI-SUGGESTED` If there were specific nose-only plugins or configurations used in the tests that pytest does not support, some tests might behave differently, although the baseline run indicates pytest is already functional.
 - `OBSERVED` No AI-written tests were produced for this dependency.
 - `OBSERVED` Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe.
 - `OBSERVED` Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested.

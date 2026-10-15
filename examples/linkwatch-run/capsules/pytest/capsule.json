@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -156,9 +156,7 @@
     ],
     "github": "pytest-dev/pytest",
     "source_url": "https://pypi.org/project/pytest/",
-    "repo_archived": false,
-    "repo_last_push": "2026-10-13",
-    "repo_days_since_push": 2
+    "repo_lookup": "HTTP 403"
   },
   "baseline_execution": {
     "provenance": "measured",

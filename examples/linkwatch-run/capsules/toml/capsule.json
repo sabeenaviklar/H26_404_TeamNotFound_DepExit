@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -134,7 +134,7 @@
     "package": null,
     "version_spec": null,
     "stdlib_module": "tomllib",
-    "rationale": "The 'toml' package is stale (STALE_UPSTREAM, no release in 5 years). Python 3.11+ provides 'tomllib' in the standard library for parsing TOML files, which is the preferred replacement. Since the target Python version is 3.12.14, we can use 'tomllib' and bump the minimum supported Python version to 3.11.",
+    "rationale": "The 'toml' package is stale (STALE_UPSTREAM, no release in 5 years). Since the target Python version is 3.12.14, we can use the standard library 'tomllib' module introduced in Python 3.11, which is the preferred approach.",
     "model_confidence": 1.0,
     "plan_checks": [
       {
@@ -147,18 +147,12 @@
   "migration_steps": {
     "provenance": "verified",
     "steps": [
-      "Update the minimum supported Python version to 3.11 in pyproject.toml to enable the use of tomllib.",
-      "Replace the 'toml' import with 'tomllib' in linkwatch/config.py.",
-      "Update the call to toml.load(path) to use tomllib.load(), which requires opening the file in binary mode.",
-      "Remove the 'toml' dependency from pyproject.toml and requirements.txt."
+      "Update 'requires-python' in 'pyproject.toml' to '>=3.11' to support 'tomllib'.",
+      "Replace 'import toml' with 'import tomllib' in 'linkwatch/config.py'.",
+      "Update 'toml.load(path)' to use 'tomllib.load()' with a binary file handle, as 'tomllib' requires binary mode.",
+      "Remove 'toml' from 'requirements.txt' and 'pyproject.toml'."
     ],
     "code_edits": [
-      {
-        "file": "pyproject.toml",
-        "why": "tomllib requires Python 3.11+.",
-        "applied": true,
-        "reason": "exact match"
-      },
       {
         "file": "linkwatch/config.py",
         "why": "Replace stale toml package with standard library tomllib.",
@@ -167,7 +161,13 @@
       },
       {
         "file": "linkwatch/config.py",
-        "why": "tomllib.load requires a binary file object, unlike toml.load which accepts a path.",
+        "why": "tomllib.load requires a binary file-like object, unlike toml.load which accepts a path string.",
+        "applied": true,
+        "reason": "exact match"
+      },
+      {
+        "file": "pyproject.toml",
+        "why": "tomllib was introduced in Python 3.11.",
         "applied": true,
         "reason": "exact match"
       }
@@ -191,7 +191,7 @@
     "provenance": "ai",
     "tests": [
       {
-        "name": "test_load_settings_migration",
+        "name": "test_load_settings_with_tomllib",
         "purpose": "Verify that load_settings correctly parses a TOML file using tomllib."
       }
     ],
@@ -202,10 +202,10 @@
     "provenance": "measured",
     "install": {
       "ok": true,
-      "seconds": 0.14,
-      "output": "Installed 24 packages in 32ms\n + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
+      "seconds": 0.07,
+      "output": "Installed 24 packages in 38ms\n + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
       "pip_check_ok": true,
-      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/toml/attempt-1/venv\nChecked 25 packages in 0.72ms\nAll installed packages are compatible"
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/toml/attempt-1/venv\nChecked 25 packages in 0.69ms\nAll installed packages are compatible"
     },
     "candidate_versions": {
       "idna": "2.7",
@@ -264,6 +264,20 @@
       },
       "missing": []
     },
+    "risk_indicators_after_change": [
+      {
+        "id": "STALE_UPSTREAM",
+        "severity": "high",
+        "resolved": true,
+        "detail": "package no longer used"
+      },
+      {
+        "id": "OLD_PIN",
+        "severity": "low",
+        "resolved": true,
+        "detail": "package no longer used"
+      }
+    ],
     "ai_written_tests": {
       "against_original_dependency": {
         "passed": 1,
@@ -279,7 +293,7 @@
       },
       "per_test": [
         {
-          "test": "test_load_settings_migration",
+          "test": "test_load_settings_with_tomllib",
           "original": "passed",
           "replacement": "passed"
         }
@@ -289,7 +303,7 @@
     "warnings_attributed_after": 0,
     "verdict": "verified",
     "verdict_reasons": [
-      "no regressions; every baseline problem attributed to this dependency is resolved"
+      "no regressions; resolved STALE_UPSTREAM, OLD_PIN"
     ]
   },
   "compatibility_gaps": [
@@ -299,13 +313,13 @@
     },
     {
       "provenance": "ai",
-      "text": "The minimum supported Python version is increased from 3.10 to 3.11."
+      "text": "The minimum supported Python version is increased from 3.10 to 3.11 to accommodate the use of 'tomllib'."
     }
   ],
   "open_concerns": [
     {
       "provenance": "ai",
-      "text": "If the project ever needs to write TOML files (which is not currently observed in the AST scan), tomllib will not be sufficient as it is read-only."
+      "text": "If the project strictly requires support for Python 3.10, this migration will break it. However, the target version is 3.12.14."
     },
     {
       "provenance": "observed",
@@ -321,11 +335,11 @@
       "attempt": 1,
       "model": "gemma-4-31b-it",
       "backend": "google",
-      "seconds": 247.1,
+      "seconds": 213.8,
       "decision": "replace",
       "verdict": "verified",
       "reasons": [
-        "no regressions; every baseline problem attributed to this dependency is resolved"
+        "no regressions; resolved STALE_UPSTREAM, OLD_PIN"
       ]
     }
   ]

@@ -6,12 +6,12 @@
     "version_spec": null,
     "stdlib_module": "tomllib"
   },
-  "rationale": "The 'toml' package is stale (STALE_UPSTREAM, no release in 5 years). Python 3.11+ provides 'tomllib' in the standard library for parsing TOML files, which is the preferred replacement. Since the target Python version is 3.12.14, we can use 'tomllib' and bump the minimum supported Python version to 3.11.",
+  "rationale": "The 'toml' package is stale (STALE_UPSTREAM, no release in 5 years). Since the target Python version is 3.12.14, we can use the standard library 'tomllib' module introduced in Python 3.11, which is the preferred approach.",
   "migration_steps": [
-    "Update the minimum supported Python version to 3.11 in pyproject.toml to enable the use of tomllib.",
-    "Replace the 'toml' import with 'tomllib' in linkwatch/config.py.",
-    "Update the call to toml.load(path) to use tomllib.load(), which requires opening the file in binary mode.",
-    "Remove the 'toml' dependency from pyproject.toml and requirements.txt."
+    "Update 'requires-python' in 'pyproject.toml' to '>=3.11' to support 'tomllib'.",
+    "Replace 'import toml' with 'import tomllib' in 'linkwatch/config.py'.",
+    "Update 'toml.load(path)' to use 'tomllib.load()' with a binary file handle, as 'tomllib' requires binary mode.",
+    "Remove 'toml' from 'requirements.txt' and 'pyproject.toml'."
   ],
   "requirement_changes": [
     {
@@ -20,12 +20,6 @@
     }
   ],
   "code_edits": [
-    {
-      "file": "pyproject.toml",
-      "find": "requires-python = \">=3.10\"",
-      "replace": "requires-python = \">=3.11\"",
-      "why": "tomllib requires Python 3.11+."
-    },
     {
       "file": "linkwatch/config.py",
       "find": "import toml",
@@ -36,21 +30,27 @@
       "file": "linkwatch/config.py",
       "find": "    data = toml.load(path)",
       "replace": "    with open(path, \"rb\") as f:\n        data = tomllib.load(f)",
-      "why": "tomllib.load requires a binary file object, unlike toml.load which accepts a path."
+      "why": "tomllib.load requires a binary file-like object, unlike toml.load which accepts a path string."
+    },
+    {
+      "file": "pyproject.toml",
+      "find": "requires-python = \">=3.10\"",
+      "replace": "requires-python = \">=3.11\"",
+      "why": "tomllib was introduced in Python 3.11."
     }
   ],
   "suggested_tests": [
     {
-      "name": "test_load_settings_migration",
+      "name": "test_load_settings_with_tomllib",
       "purpose": "Verify that load_settings correctly parses a TOML file using tomllib.",
-      "code": "import os\nimport tempfile\nfrom linkwatch.config import load_settings\n\ndef test_load_settings_migration():\n    # Create a temporary TOML file\n    toml_content = 'title = \"test-title\"\\noutput = \"test.html\"\\n[[sites]]\\nname = \"test-site\"\\nurl = \"https://test.com\"'\n    with tempfile.NamedTemporaryFile(mode=\"w\", suffix=\".toml\", delete=False) as f:\n        f.write(toml_content)\n        temp_path = f.name\n    \n    try:\n        settings = load_settings(temp_path)\n        assert settings.title == \"test-title\"\n        assert settings.output == \"test.html\"\n        assert len(settings.sites) == 1\n        assert settings.sites[0].name == \"test-site\"\n        assert settings.sites[0].url == \"https://test.com\"\n    finally:\n        if os.path.exists(temp_path):\n            os.remove(temp_path)"
+      "code": "import pytest\nimport os\nfrom linkwatch.config import load_settings\n\ndef test_load_settings_with_tomllib(tmp_path):\n    config_file = tmp_path / \"sites.toml\"\n    content = 'title = \"test-title\"\\noutput = \"test.html\"\\n[[sites]]\\nname = \"site1\"\\nurl = \"http://site1.com\"'\n    config_file.write_text(content, encoding=\"utf-8\")\n    \n    settings = load_settings(str(config_file))\n    assert settings.title == \"test-title\"\n    assert settings.output == \"test.html\"\n    assert len(settings.sites) == 1\n    assert settings.sites[0].name == \"site1\"\n    assert settings.sites[0].url == \"http://site1.com\""
     }
   ],
   "compatibility_notes": [
-    "The minimum supported Python version is increased from 3.10 to 3.11."
+    "The minimum supported Python version is increased from 3.10 to 3.11 to accommodate the use of 'tomllib'."
   ],
   "risks": [
-    "If the project ever needs to write TOML files (which is not currently observed in the AST scan), tomllib will not be sufficient as it is read-only."
+    "If the project strictly requires support for Python 3.10, this migration will break it. However, the target version is 3.12.14."
   ],
   "confidence": 1.0
 }

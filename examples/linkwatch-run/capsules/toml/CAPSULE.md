@@ -31,28 +31,28 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 **replace** → `tomllib` (model confidence 1.0)
 
-The 'toml' package is stale (STALE_UPSTREAM, no release in 5 years). Python 3.11+ provides 'tomllib' in the standard library for parsing TOML files, which is the preferred replacement. Since the target Python version is 3.12.14, we can use 'tomllib' and bump the minimum supported Python version to 3.11.
+The 'toml' package is stale (STALE_UPSTREAM, no release in 5 years). Since the target Python version is 3.12.14, we can use the standard library 'tomllib' module introduced in Python 3.11, which is the preferred approach.
 
 - ✓ 'tomllib' is a standard-library module `OBSERVED` 
 
 ## Migration steps `AI · VERIFIED`
 
-1. Update the minimum supported Python version to 3.11 in pyproject.toml to enable the use of tomllib.
-2. Replace the 'toml' import with 'tomllib' in linkwatch/config.py.
-3. Update the call to toml.load(path) to use tomllib.load(), which requires opening the file in binary mode.
-4. Remove the 'toml' dependency from pyproject.toml and requirements.txt.
+1. Update 'requires-python' in 'pyproject.toml' to '>=3.11' to support 'tomllib'.
+2. Replace 'import toml' with 'import tomllib' in 'linkwatch/config.py'.
+3. Update 'toml.load(path)' to use 'tomllib.load()' with a binary file handle, as 'tomllib' requires binary mode.
+4. Remove 'toml' from 'requirements.txt' and 'pyproject.toml'.
 
 Applied edits `MEASURED`:
-- `pyproject.toml`: applied (exact match) tomllib requires Python 3.11+.
 - `linkwatch/config.py`: applied (exact match) Replace stale toml package with standard library tomllib.
-- `linkwatch/config.py`: applied (exact match) tomllib.load requires a binary file object, unlike toml.load which accepts a path.
+- `linkwatch/config.py`: applied (exact match) tomllib.load requires a binary file-like object, unlike toml.load which accepts a path string.
+- `pyproject.toml`: applied (exact match) tomllib was introduced in Python 3.11.
 - remove `toml` in pyproject.toml, requirements.txt
 
 Full patch: [`patch.diff`](patch.diff)
 
 ## Suggested tests `AI-SUGGESTED`
 
-- `test_load_settings_migration`: Verify that load_settings correctly parses a TOML file using tomllib.
+- `test_load_settings_with_tomllib`: Verify that load_settings correctly parses a TOML file using tomllib.
 
 ## Executed test results `MEASURED`
 
@@ -62,23 +62,28 @@ Full patch: [`patch.diff`](patch.diff)
 - Warnings attributed to this dependency: 0 before → 0 after
 - `import tomllib` in candidate: ok
 
+| Risk indicator | Resolved by this change? | Re-checked on the changed copy |
+|---|---|---|
+| STALE_UPSTREAM | yes | package no longer used |
+| OLD_PIN | yes | package no longer used |
+
 | AI-written test | Original dependency | Replacement |
 |---|---|---|
-| `test_load_settings_migration` | passed | passed |
+| `test_load_settings_with_tomllib` | passed | passed |
 
-**Verdict: VERIFIED** — no regressions; every baseline problem attributed to this dependency is resolved
+**Verdict: VERIFIED** — no regressions; resolved STALE_UPSTREAM, OLD_PIN
 
 ## Compatibility gaps
 
 - `MEASURED` Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)
-- `AI-SUGGESTED` The minimum supported Python version is increased from 3.10 to 3.11.
+- `AI-SUGGESTED` The minimum supported Python version is increased from 3.10 to 3.11 to accommodate the use of 'tomllib'.
 
 ## Attempts
 
-- #1 gemma-4-31b-it (google, 247.1s): replace → verified
+- #1 gemma-4-31b-it (google, 213.8s): replace → verified
 
 ## Open concerns and limitations
 
-- `AI-SUGGESTED` If the project ever needs to write TOML files (which is not currently observed in the AST scan), tomllib will not be sufficient as it is read-only.
+- `AI-SUGGESTED` If the project strictly requires support for Python 3.10, this migration will break it. However, the target version is 3.12.14.
 - `OBSERVED` Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe.
 - `OBSERVED` Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested.

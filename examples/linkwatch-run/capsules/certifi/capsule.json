@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -113,26 +113,26 @@
     "package": null,
     "version_spec": null,
     "stdlib_module": null,
-    "rationale": "The 'certifi' package is used only to provide the CA bundle path to 'requests' via 'certifi.where()'. However, 'requests' uses 'certifi' by default when 'verify=True' (which is the default behavior). Removing the explicit call and import removes the undeclared dependency risk without changing functionality, as 'requests' already depends on 'certifi' and handles the bundle path internally.",
+    "rationale": "The `certifi` package is used only to provide the CA bundle path to `requests.get()` via `verify=certifi.where()`. However, `requests` already uses `certifi` by default when `verify=True` (which is the default value). Removing the explicit import and call removes the redundant code and resolves the UNDECLARED dependency risk without changing the behavior of the application.",
     "model_confidence": 1.0,
     "plan_checks": []
   },
   "migration_steps": {
     "provenance": "verified",
     "steps": [
-      "Remove the explicit import of 'certifi' in 'linkwatch/checker.py'.",
-      "Remove the 'verify=certifi.where()' argument from the 'session.get' call in 'linkwatch/checker.py', allowing 'requests' to use its default CA bundle."
+      "Remove the explicit import of `certifi` in `linkwatch/checker.py`.",
+      "Remove the `verify=certifi.where()` argument from the `session.get` call in `linkwatch/checker.py`, allowing `requests` to use its default verification behavior."
     ],
     "code_edits": [
       {
         "file": "linkwatch/checker.py",
-        "why": "Remove unused certifi import",
+        "why": "Remove unused import",
         "applied": true,
         "reason": "exact match"
       },
       {
         "file": "linkwatch/checker.py",
-        "why": "Use requests default CA bundle instead of explicitly calling certifi.where()",
+        "why": "requests uses certifi by default for SSL verification",
         "applied": true,
         "reason": "exact match"
       }
@@ -144,8 +144,8 @@
     "provenance": "ai",
     "tests": [
       {
-        "name": "test_fetch_no_certifi_import",
-        "purpose": "Ensure that fetch still works and doesn't raise ImportError after removing certifi import"
+        "name": "test_fetch_basic",
+        "purpose": "Ensure fetch still works for basic HTTP requests after removing explicit certifi usage"
       }
     ],
     "file": "tests/test_depexit_certifi.py",
@@ -155,10 +155,10 @@
     "provenance": "measured",
     "install": {
       "ok": true,
-      "seconds": 0.15,
+      "seconds": 0.05,
       "output": " + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
       "pip_check_ok": true,
-      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/certifi/attempt-1/venv\nChecked 26 packages in 0.85ms\nAll installed packages are compatible"
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/certifi/attempt-1/venv\nChecked 26 packages in 0.80ms\nAll installed packages are compatible"
     },
     "candidate_versions": {
       "idna": "2.7",
@@ -218,6 +218,14 @@
       },
       "missing": []
     },
+    "risk_indicators_after_change": [
+      {
+        "id": "UNDECLARED",
+        "severity": "high",
+        "resolved": true,
+        "detail": "no longer imported"
+      }
+    ],
     "ai_written_tests": {
       "against_original_dependency": {
         "passed": 1,
@@ -233,7 +241,7 @@
       },
       "per_test": [
         {
-          "test": "test_fetch_no_certifi_import",
+          "test": "test_fetch_basic",
           "original": "passed",
           "replacement": "passed"
         }
@@ -243,7 +251,7 @@
     "warnings_attributed_after": 0,
     "verdict": "verified",
     "verdict_reasons": [
-      "no regressions; every baseline problem attributed to this dependency is resolved"
+      "no regressions; resolved UNDECLARED"
     ]
   },
   "compatibility_gaps": [
@@ -253,13 +261,13 @@
     },
     {
       "provenance": "ai",
-      "text": "The code now relies on 'requests' default CA bundle management, which is the standard way to use 'certifi' with 'requests'."
+      "text": "The application will now respect the `REQUESTS_CA_BUNDLE` and `CURL_CA_BUNDLE` environment variables if set, which is the standard behavior for `requests` and generally preferred over forcing the `certifi` bundle."
     }
   ],
   "open_concerns": [
     {
       "provenance": "ai",
-      "text": "If the environment had a non-standard 'certifi' configuration that 'requests' doesn't pick up automatically, this could theoretically change behavior, but 'certifi.where()' is exactly what 'requests' uses internally."
+      "text": "If the environment has a broken `certifi` installation that `requests` cannot find but `certifi.where()` could somehow resolve, this might fail, but this is extremely unlikely as `requests` depends on `certifi`."
     },
     {
       "provenance": "observed",
@@ -275,11 +283,11 @@
       "attempt": 1,
       "model": "gemma-4-31b-it",
       "backend": "google",
-      "seconds": 169.2,
+      "seconds": 147.9,
       "decision": "remove",
       "verdict": "verified",
       "reasons": [
-        "no regressions; every baseline problem attributed to this dependency is resolved"
+        "no regressions; resolved UNDECLARED"
       ]
     }
   ]

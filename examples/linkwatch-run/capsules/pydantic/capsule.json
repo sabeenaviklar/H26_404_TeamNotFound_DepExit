@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -141,7 +141,7 @@
     ],
     "github": "sponsors/samuelcolvin",
     "source_url": "https://pypi.org/project/pydantic/",
-    "repo_lookup": "HTTP 403"
+    "repo_lookup": "HTTP 404"
   },
   "baseline_execution": {
     "provenance": "measured",
@@ -170,9 +170,9 @@
     "provenance": "verified",
     "decision": "upgrade",
     "package": "pydantic",
-    "version_spec": ">=2.0",
+    "version_spec": ">=2",
     "stdlib_module": null,
-    "rationale": "The repository has a SPEC_CONFLICT between requirements.txt (==1.10.13) and pyproject.toml (>=2). The installed version is 1.10.13, but the code is triggering V2 deprecation warnings during installation/execution. Upgrading to Pydantic V2 aligns the manifests and removes the risk of using an outdated major version.",
+    "rationale": "The repository has a high-risk SPEC_CONFLICT between requirements.txt (==1.10.13) and pyproject.toml (>=2). It is also using an outdated version of pydantic (1.10.13) and triggering deprecation warnings related to V2 config keys. Upgrading to Pydantic v2 resolves the conflict and aligns the codebase with the declared intent in pyproject.toml.",
     "model_confidence": 1.0,
     "plan_checks": [
       {
@@ -185,37 +185,37 @@
   "migration_steps": {
     "provenance": "verified",
     "steps": [
-      "Update pydantic version in requirements.txt to match pyproject.toml (>=2.0).",
-      "Update linkwatch/config.py to use Pydantic V2 syntax: replace 'validator' with 'field_validator', 'class Config' with 'model_config = ConfigDict(...)', and add '@classmethod' to validators."
+      "Update requirements.txt to use pydantic>=2 to resolve the version conflict with pyproject.toml.",
+      "Update linkwatch/config.py to use Pydantic v2 syntax: replace 'class Config' with 'model_config = ConfigDict(...)', and replace '@validator' with '@field_validator'."
     ],
     "code_edits": [
       {
         "file": "linkwatch/config.py",
-        "why": "Import V2 replacements for validator and Config",
+        "why": "Import Pydantic v2's field_validator and ConfigDict.",
         "applied": true,
         "reason": "exact match"
       },
       {
         "file": "linkwatch/config.py",
-        "why": "Migrate V1 Config to V2 ConfigDict",
+        "why": "Replace v1 Config class with v2 ConfigDict and update anystr_strip_whitespace to str_strip_whitespace.",
         "applied": true,
         "reason": "exact match"
       },
       {
         "file": "linkwatch/config.py",
-        "why": "Migrate V1 validator to V2 field_validator",
+        "why": "Replace deprecated @validator with @field_validator.",
         "applied": true,
         "reason": "exact match"
       },
       {
         "file": "linkwatch/config.py",
-        "why": "Migrate V1 validator to V2 field_validator",
+        "why": "Replace deprecated @validator with @field_validator.",
         "applied": true,
         "reason": "exact match"
       },
       {
         "file": "linkwatch/config.py",
-        "why": "Migrate V1 Config to V2 ConfigDict",
+        "why": "Replace v1 Config class with v2 ConfigDict.",
         "applied": true,
         "reason": "exact match"
       }
@@ -225,7 +225,7 @@
         "change": {
           "action": "set",
           "package": "pydantic",
-          "requirement": "pydantic>=2.0"
+          "requirement": "pydantic>=2"
         },
         "files": [
           "pyproject.toml",
@@ -240,8 +240,16 @@
     "provenance": "ai",
     "tests": [
       {
-        "name": "test_pydantic_v2_migration",
-        "purpose": "Verify that Site and Settings validation still works as expected with Pydantic V2"
+        "name": "test_site_validation",
+        "purpose": "Verify that Site validation still works (empty name and invalid URL scheme)."
+      },
+      {
+        "name": "test_site_strip_whitespace",
+        "purpose": "Verify that whitespace stripping is still active in Pydantic v2."
+      },
+      {
+        "name": "test_settings_extra_forbid",
+        "purpose": "Verify that extra fields are still forbidden in Settings."
       }
     ],
     "file": "tests/test_depexit_pydantic.py",
@@ -251,10 +259,10 @@
     "provenance": "measured",
     "install": {
       "ok": true,
-      "seconds": 0.5,
+      "seconds": 0.16,
       "output": " + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.8.0",
       "pip_check_ok": true,
-      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/pydantic/attempt-1/venv\nChecked 29 packages in 0.79ms\nAll installed packages are compatible"
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/pydantic/attempt-1/venv\nChecked 29 packages in 0.78ms\nAll installed packages are compatible"
     },
     "candidate_versions": {
       "idna": "2.7",
@@ -317,22 +325,47 @@
       },
       "missing": []
     },
+    "risk_indicators_after_change": [
+      {
+        "id": "DEPRECATION_WARNINGS",
+        "severity": "medium",
+        "resolved": true,
+        "detail": "0 attributed warning(s) left"
+      },
+      {
+        "id": "SPEC_CONFLICT",
+        "severity": "high",
+        "resolved": true,
+        "detail": "manifests agree"
+      },
+      {
+        "id": "OUTDATED_PIN",
+        "severity": "medium",
+        "resolved": true,
+        "detail": "now 2.14.1"
+      }
+    ],
     "ai_written_tests": {
       "against_original_dependency": {
-        "passed": 2,
+        "passed": 3,
         "failed": 0,
         "error": 0,
         "skipped": 0
       },
       "against_replacement": {
-        "passed": 2,
+        "passed": 3,
         "failed": 0,
         "error": 0,
         "skipped": 0
       },
       "per_test": [
         {
-          "test": "test_settings_validation",
+          "test": "test_settings_extra_forbid",
+          "original": "passed",
+          "replacement": "passed"
+        },
+        {
+          "test": "test_site_strip_whitespace",
           "original": "passed",
           "replacement": "passed"
         },
@@ -347,7 +380,7 @@
     "warnings_attributed_after": 0,
     "verdict": "verified",
     "verdict_reasons": [
-      "no regressions; every baseline problem attributed to this dependency is resolved"
+      "no regressions; resolved DEPRECATION_WARNINGS, SPEC_CONFLICT, OUTDATED_PIN"
     ]
   },
   "compatibility_gaps": [
@@ -357,13 +390,13 @@
     },
     {
       "provenance": "ai",
-      "text": "Pydantic V2 introduces breaking changes in configuration and validation decorators. The migration uses ConfigDict and field_validator."
+      "text": "Pydantic v2 is a major rewrite; while the logic in this repository is simple, the migration from 'class Config' to 'ConfigDict' and '@validator' to '@field_validator' is required for full compatibility and to remove warnings."
     }
   ],
   "open_concerns": [
     {
       "provenance": "ai",
-      "text": "If other parts of the code (not found in AST scan) use Pydantic V1 features, they might break."
+      "text": "Pydantic v2 has different internal behavior for some edge cases of validation, though the current usage in this repo is straightforward."
     },
     {
       "provenance": "observed",
@@ -379,11 +412,11 @@
       "attempt": 1,
       "model": "gemma-4-31b-it",
       "backend": "google",
-      "seconds": 245.4,
+      "seconds": 326.2,
       "decision": "upgrade",
       "verdict": "verified",
       "reasons": [
-        "no regressions; every baseline problem attributed to this dependency is resolved"
+        "no regressions; resolved DEPRECATION_WARNINGS, SPEC_CONFLICT, OUTDATED_PIN"
       ]
     }
   ]

@@ -8,7 +8,7 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 - Relation: direct; installed 9.1.1; imports py, pytest
 - Declared in `requirements-dev.txt:1` as `pytest` (dev)
-- PyPI latest 9.1.1 (2026-06-19); upstream pytest-dev/pytest, archived=False, last push 2026-10-13
+- PyPI latest 9.1.1 (2026-06-19); upstream pytest-dev/pytest
 
 ## Risk indicators
 

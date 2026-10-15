@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -130,9 +130,9 @@
     "provenance": "verified",
     "decision": "replace",
     "package": "platformdirs",
-    "version_spec": "",
+    "version_spec": ">=4.0.0",
     "stdlib_module": null,
-    "rationale": "The appdirs package is stale (STALE_UPSTREAM), with no releases since 2020. platformdirs is the widely accepted, maintained drop-in replacement for appdirs and is fully compatible with Python 3.12.",
+    "rationale": "The 'appdirs' package is stale (STALE_UPSTREAM), with no releases since 2020. 'platformdirs' is the officially recommended, maintained drop-in replacement that provides the same functionality for locating user directories across different platforms and fully supports Python 3.12.",
     "model_confidence": 1.0,
     "plan_checks": [
       {
@@ -145,13 +145,13 @@
   "migration_steps": {
     "provenance": "verified",
     "steps": [
-      "Replace appdirs with platformdirs in the dependency manifests (pyproject.toml and requirements.txt).",
-      "Update the import statement in linkwatch/cache.py to use platformdirs instead of appdirs."
+      "Replace 'appdirs' with 'platformdirs' in the project dependency manifests.",
+      "Update the import statement in 'linkwatch/cache.py' to use 'platformdirs' instead of 'appdirs'."
     ],
     "code_edits": [
       {
         "file": "linkwatch/cache.py",
-        "why": "Switch from stale appdirs to maintained platformdirs.",
+        "why": "Switch from stale 'appdirs' to maintained 'platformdirs'.",
         "applied": true,
         "reason": "exact match"
       }
@@ -171,7 +171,7 @@
       {
         "change": {
           "action": "add",
-          "requirement": "platformdirs"
+          "requirement": "platformdirs>=4.0.0"
         },
         "files": [
           "pyproject.toml",
@@ -186,8 +186,12 @@
     "provenance": "ai",
     "tests": [
       {
-        "name": "test_cache_dir_functionality",
-        "purpose": "Verify that cache_dir still returns a valid path and respects the LINKWATCH_CACHE_DIR environment variable."
+        "name": "test_cache_dir_env_override",
+        "purpose": "Ensure that the LINKWATCH_CACHE_DIR environment variable still overrides the default cache directory."
+      },
+      {
+        "name": "test_cache_dir_default",
+        "purpose": "Ensure that cache_dir() returns a valid absolute path when no environment variable is set."
       }
     ],
     "file": "tests/test_depexit_appdirs.py",
@@ -197,10 +201,10 @@
     "provenance": "measured",
     "install": {
       "ok": true,
-      "seconds": 1.13,
+      "seconds": 0.33,
       "output": " + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + platformdirs==4.13.0\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
       "pip_check_ok": true,
-      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/appdirs/attempt-1/venv\nChecked 26 packages in 0.85ms\nAll installed packages are compatible"
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/appdirs/attempt-1/venv\nChecked 26 packages in 0.88ms\nAll installed packages are compatible"
     },
     "candidate_versions": {
       "idna": "2.7",
@@ -260,6 +264,20 @@
       },
       "missing": []
     },
+    "risk_indicators_after_change": [
+      {
+        "id": "STALE_UPSTREAM",
+        "severity": "high",
+        "resolved": true,
+        "detail": "package no longer used"
+      },
+      {
+        "id": "OLD_PIN",
+        "severity": "low",
+        "resolved": true,
+        "detail": "package no longer used"
+      }
+    ],
     "ai_written_tests": {
       "against_original_dependency": {
         "passed": 2,
@@ -280,7 +298,7 @@
           "replacement": "passed"
         },
         {
-          "test": "test_cache_dir_env_var",
+          "test": "test_cache_dir_env_override",
           "original": "passed",
           "replacement": "passed"
         }
@@ -290,7 +308,7 @@
     "warnings_attributed_after": 0,
     "verdict": "verified",
     "verdict_reasons": [
-      "no regressions; every baseline problem attributed to this dependency is resolved"
+      "no regressions; resolved STALE_UPSTREAM, OLD_PIN"
     ]
   },
   "compatibility_gaps": [
@@ -300,13 +318,13 @@
     },
     {
       "provenance": "ai",
-      "text": "platformdirs.user_cache_dir is a drop-in replacement for appdirs.user_cache_dir for the usage pattern found in this repository."
+      "text": "platformdirs.user_cache_dir is a drop-in replacement for appdirs.user_cache_dir and behaves identically on Windows, macOS, and Linux."
     }
   ],
   "open_concerns": [
     {
       "provenance": "ai",
-      "text": "There may be minor differences in the default cache directory paths chosen by platformdirs versus appdirs on some operating systems, which could lead to the application not finding existing caches after the migration."
+      "text": "Minor differences in path resolution on very niche operating systems, though unlikely to affect standard environments."
     },
     {
       "provenance": "observed",
@@ -322,11 +340,11 @@
       "attempt": 1,
       "model": "gemma-4-31b-it",
       "backend": "google",
-      "seconds": 267.5,
+      "seconds": 151.1,
       "decision": "replace",
       "verdict": "verified",
       "reasons": [
-        "no regressions; every baseline problem attributed to this dependency is resolved"
+        "no regressions; resolved STALE_UPSTREAM, OLD_PIN"
       ]
     }
   ]

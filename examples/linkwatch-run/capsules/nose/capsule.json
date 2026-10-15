@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -140,26 +140,26 @@
     "package": null,
     "version_spec": null,
     "stdlib_module": null,
-    "rationale": "The 'nose' package is incompatible with Python 3.12 because it relies on the 'imp' module, which was removed in this Python version (IMPORT_FAILS). Additionally, 'nose' is STALE_UPSTREAM with no releases since 2015. The repository already uses 'pytest' as its primary test runner (as seen in the 'test' target of the Makefile and 'requirements-dev.txt'), making 'nose' redundant.",
+    "rationale": "The 'nose' package is broken on Python 3.12 because it relies on the 'imp' module, which was removed in this Python version (IMPORT_FAILS). Furthermore, 'nose' is unmaintained (STALE_UPSTREAM) and redundant since 'pytest' is already a declared dependency and used as the primary test runner in the Makefile.",
     "model_confidence": 1.0,
     "plan_checks": []
   },
   "migration_steps": {
     "provenance": "verified",
     "steps": [
-      "Remove 'nose' from 'requirements-dev.txt'.",
-      "Remove the 'test-nose' target and its reference in '.PHONY' from the 'Makefile'."
+      "Remove 'nose' from requirements-dev.txt",
+      "Remove the 'test-nose' target from the Makefile"
     ],
     "code_edits": [
       {
         "file": "Makefile",
-        "why": "Remove test-nose from the list of phony targets.",
+        "why": "Remove test-nose from phony targets",
         "applied": true,
         "reason": "exact match"
       },
       {
         "file": "Makefile",
-        "why": "Remove the redundant and broken nose test target.",
+        "why": "Remove the broken and redundant nose test target",
         "applied": true,
         "reason": "exact match"
       }
@@ -188,10 +188,10 @@
     "provenance": "measured",
     "install": {
       "ok": true,
-      "seconds": 0.05,
-      "output": "Installed 24 packages in 19ms\n + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
+      "seconds": 0.07,
+      "output": "Installed 24 packages in 29ms\n + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
       "pip_check_ok": true,
-      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/nose/attempt-1/venv\nChecked 25 packages in 0.70ms\nAll installed packages are compatible"
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/nose/attempt-1/venv\nChecked 25 packages in 0.71ms\nAll installed packages are compatible"
     },
     "candidate_versions": {
       "idna": "2.7",
@@ -242,12 +242,38 @@
       },
       "missing": []
     },
+    "risk_indicators_after_change": [
+      {
+        "id": "IMPORT_FAILS",
+        "severity": "critical",
+        "resolved": true,
+        "detail": "imports cleanly"
+      },
+      {
+        "id": "TOOLING_ONLY",
+        "severity": "low",
+        "resolved": null,
+        "detail": "informational"
+      },
+      {
+        "id": "STALE_UPSTREAM",
+        "severity": "high",
+        "resolved": true,
+        "detail": "package no longer used"
+      },
+      {
+        "id": "OLD_PIN",
+        "severity": "low",
+        "resolved": true,
+        "detail": "package no longer used"
+      }
+    ],
     "ai_written_tests": null,
     "warnings_attributed_before": 0,
     "warnings_attributed_after": 0,
     "verdict": "verified",
     "verdict_reasons": [
-      "no regressions; every baseline problem attributed to this dependency is resolved"
+      "no regressions; resolved IMPORT_FAILS, STALE_UPSTREAM, OLD_PIN"
     ]
   },
   "compatibility_gaps": [
@@ -257,14 +283,10 @@
     },
     {
       "provenance": "ai",
-      "text": "The 'test-nose' Makefile target is removed. Users should use 'make test' which runs pytest."
+      "text": "The project already uses pytest for its main 'test' target, so removing nose does not affect the primary testing workflow."
     }
   ],
   "open_concerns": [
-    {
-      "provenance": "ai",
-      "text": "If there were specific nose-only plugins or configurations used in the tests that pytest does not support, some tests might behave differently, although the baseline run indicates pytest is already functional."
-    },
     {
       "provenance": "observed",
       "text": "No AI-written tests were produced for this dependency."
@@ -283,11 +305,11 @@
       "attempt": 1,
       "model": "gemma-4-31b-it",
       "backend": "google",
-      "seconds": 176.2,
+      "seconds": 145.7,
       "decision": "remove",
       "verdict": "verified",
       "reasons": [
-        "no regressions; every baseline problem attributed to this dependency is resolved"
+        "no regressions; resolved IMPORT_FAILS, STALE_UPSTREAM, OLD_PIN"
       ]
     }
   ]

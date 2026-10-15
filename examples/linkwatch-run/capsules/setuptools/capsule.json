@@ -1,6 +1,6 @@
 {
   "capsule_version": "1.0",
-  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generated_at": "2026-10-15T07:21:39+00:00",
   "generator": "depexit 0.1.0",
   "target": {
     "source": "https://github.com/rishrek/LinkWatch",
@@ -149,7 +149,7 @@
     "package": null,
     "version_spec": null,
     "stdlib_module": "importlib.resources",
-    "rationale": "The package uses `pkg_resources` to locate templates, which is deprecated (DEPRECATION_WARNINGS). The modern standard library replacement is `importlib.resources`. Since `setuptools` is only used for this purpose at runtime, it can be removed from the runtime dependencies.",
+    "rationale": "The repository uses `pkg_resources` from `setuptools` to locate package resources, which is deprecated (DEPRECATION_WARNINGS). In Python 3.9+, `importlib.resources` is the standard library replacement. Since the target Python version is 3.12.14, we can replace `pkg_resources` with `importlib.resources` and remove `setuptools` as a runtime dependency.",
     "model_confidence": 1.0,
     "plan_checks": [
       {
@@ -162,19 +162,19 @@
   "migration_steps": {
     "provenance": "verified",
     "steps": [
-      "Replace `pkg_resources.resource_filename` with `importlib.resources.files().joinpath()` in `linkwatch/resources.py`.",
-      "Remove `setuptools` from the runtime dependencies in `pyproject.toml` and `requirements.txt`."
+      "Replace `pkg_resources` imports and calls with `importlib.resources` in `linkwatch/resources.py`.",
+      "Remove `setuptools` from `pyproject.toml` and `requirements.txt` runtime dependencies."
     ],
     "code_edits": [
       {
         "file": "linkwatch/resources.py",
-        "why": "Replace deprecated pkg_resources with stdlib importlib.resources",
+        "why": "Replace deprecated pkg_resources with standard library importlib.resources",
         "applied": true,
         "reason": "exact match"
       },
       {
         "file": "linkwatch/resources.py",
-        "why": "Use the modern importlib.resources.files API to locate the templates directory",
+        "why": "Replace pkg_resources.resource_filename with the modern importlib.resources.files API",
         "applied": true,
         "reason": "exact match"
       }
@@ -199,7 +199,7 @@
     "tests": [
       {
         "name": "test_template_dir_is_valid",
-        "purpose": "Ensure template_dir() still returns a valid path to the templates directory"
+        "purpose": "Verify that template_dir() still returns a valid path to the templates directory"
       }
     ],
     "file": "tests/test_depexit_setuptools.py",
@@ -209,10 +209,10 @@
     "provenance": "measured",
     "install": {
       "ok": true,
-      "seconds": 0.07,
-      "output": "Installed 24 packages in 15ms\n + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
+      "seconds": 0.31,
+      "output": "Installed 24 packages in 57ms\n + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
       "pip_check_ok": true,
-      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/setuptools/attempt-1/venv\nChecked 25 packages in 0.51ms\nAll installed packages are compatible"
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/setuptools/attempt-1/venv\nChecked 25 packages in 0.75ms\nAll installed packages are compatible"
     },
     "candidate_versions": {
       "idna": "2.7",
@@ -271,6 +271,20 @@
       },
       "missing": []
     },
+    "risk_indicators_after_change": [
+      {
+        "id": "DEPRECATION_WARNINGS",
+        "severity": "medium",
+        "resolved": true,
+        "detail": "0 attributed warning(s) left"
+      },
+      {
+        "id": "OUTDATED_PIN",
+        "severity": "medium",
+        "resolved": true,
+        "detail": "package no longer used"
+      }
+    ],
     "ai_written_tests": {
       "against_original_dependency": {
         "passed": 1,
@@ -296,7 +310,7 @@
     "warnings_attributed_after": 0,
     "verdict": "verified",
     "verdict_reasons": [
-      "no regressions; every baseline problem attributed to this dependency is resolved"
+      "no regressions; resolved DEPRECATION_WARNINGS, OUTDATED_PIN"
     ]
   },
   "compatibility_gaps": [
@@ -306,13 +320,13 @@
     },
     {
       "provenance": "ai",
-      "text": "importlib.resources.files was introduced in Python 3.9, which is compatible with the project's >=3.10 requirement."
+      "text": "importlib.resources.files().joinpath() returns a Traversable object; converting it to str() ensures compatibility with code expecting a string path, matching the behavior of pkg_resources.resource_filename."
     }
   ],
   "open_concerns": [
     {
       "provenance": "ai",
-      "text": "If the package is installed in a non-standard way (e.g., as a zip file), importlib.resources.files().joinpath() might return a Traversable object that doesn't resolve to a physical filesystem path via str(). However, for standard pip installations, this is the correct replacement for resource_filename."
+      "text": "If the package is installed in a non-standard way (e.g., some very specific zip-safe configurations), importlib.resources might behave differently than pkg_resources, although it is the officially recommended replacement."
     },
     {
       "provenance": "observed",
@@ -328,11 +342,11 @@
       "attempt": 1,
       "model": "gemma-4-31b-it",
       "backend": "google",
-      "seconds": 173.5,
+      "seconds": 114.0,
       "decision": "remove",
       "verdict": "verified",
       "reasons": [
-        "no regressions; every baseline problem attributed to this dependency is resolved"
+        "no regressions; resolved DEPRECATION_WARNINGS, OUTDATED_PIN"
       ]
     }
   ]

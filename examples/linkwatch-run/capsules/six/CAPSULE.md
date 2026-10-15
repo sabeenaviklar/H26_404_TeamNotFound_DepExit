@@ -9,7 +9,7 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 - Relation: direct; installed 1.17.0; imports six
 - Declared in `requirements.txt:7` as `six` (runtime)
 - Declared in `pyproject.toml:19` as `six` (runtime)
-- PyPI latest 1.17.0 (2024-12-04); upstream benjaminp/six
+- PyPI latest 1.17.0 (2024-12-04); upstream benjaminp/six, archived=False, last push 2026-02-23
 
 ## Risk indicators
 

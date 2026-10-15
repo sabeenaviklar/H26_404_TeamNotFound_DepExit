@@ -34,30 +34,32 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 ## Proposed replacement `AI · VERIFIED`
 
-**upgrade** → `pydantic>=2.0` (model confidence 1.0)
+**upgrade** → `pydantic>=2` (model confidence 1.0)
 
-The repository has a SPEC_CONFLICT between requirements.txt (==1.10.13) and pyproject.toml (>=2). The installed version is 1.10.13, but the code is triggering V2 deprecation warnings during installation/execution. Upgrading to Pydantic V2 aligns the manifests and removes the risk of using an outdated major version.
+The repository has a high-risk SPEC_CONFLICT between requirements.txt (==1.10.13) and pyproject.toml (>=2). It is also using an outdated version of pydantic (1.10.13) and triggering deprecation warnings related to V2 config keys. Upgrading to Pydantic v2 resolves the conflict and aligns the codebase with the declared intent in pyproject.toml.
 
 - ✓ package 'pydantic' exists on PyPI `OBSERVED` latest 2.14.1
 
 ## Migration steps `AI · VERIFIED`
 
-1. Update pydantic version in requirements.txt to match pyproject.toml (>=2.0).
-2. Update linkwatch/config.py to use Pydantic V2 syntax: replace 'validator' with 'field_validator', 'class Config' with 'model_config = ConfigDict(...)', and add '@classmethod' to validators.
+1. Update requirements.txt to use pydantic>=2 to resolve the version conflict with pyproject.toml.
+2. Update linkwatch/config.py to use Pydantic v2 syntax: replace 'class Config' with 'model_config = ConfigDict(...)', and replace '@validator' with '@field_validator'.
 
 Applied edits `MEASURED`:
-- `linkwatch/config.py`: applied (exact match) Import V2 replacements for validator and Config
-- `linkwatch/config.py`: applied (exact match) Migrate V1 Config to V2 ConfigDict
-- `linkwatch/config.py`: applied (exact match) Migrate V1 validator to V2 field_validator
-- `linkwatch/config.py`: applied (exact match) Migrate V1 validator to V2 field_validator
-- `linkwatch/config.py`: applied (exact match) Migrate V1 Config to V2 ConfigDict
-- set `pydantic>=2.0` in pyproject.toml, requirements.txt
+- `linkwatch/config.py`: applied (exact match) Import Pydantic v2's field_validator and ConfigDict.
+- `linkwatch/config.py`: applied (exact match) Replace v1 Config class with v2 ConfigDict and update anystr_strip_whitespace to str_strip_whitespace.
+- `linkwatch/config.py`: applied (exact match) Replace deprecated @validator with @field_validator.
+- `linkwatch/config.py`: applied (exact match) Replace deprecated @validator with @field_validator.
+- `linkwatch/config.py`: applied (exact match) Replace v1 Config class with v2 ConfigDict.
+- set `pydantic>=2` in pyproject.toml, requirements.txt
 
 Full patch: [`patch.diff`](patch.diff)
 
 ## Suggested tests `AI-SUGGESTED`
 
-- `test_pydantic_v2_migration`: Verify that Site and Settings validation still works as expected with Pydantic V2
+- `test_site_validation`: Verify that Site validation still works (empty name and invalid URL scheme).
+- `test_site_strip_whitespace`: Verify that whitespace stripping is still active in Pydantic v2.
+- `test_settings_extra_forbid`: Verify that extra fields are still forbidden in Settings.
 
 ## Executed test results `MEASURED`
 
@@ -67,24 +69,31 @@ Full patch: [`patch.diff`](patch.diff)
 - Warnings attributed to this dependency: 0 before → 0 after
 - `import pydantic` in candidate: ok
 
+| Risk indicator | Resolved by this change? | Re-checked on the changed copy |
+|---|---|---|
+| DEPRECATION_WARNINGS | yes | 0 attributed warning(s) left |
+| SPEC_CONFLICT | yes | manifests agree |
+| OUTDATED_PIN | yes | now 2.14.1 |
+
 | AI-written test | Original dependency | Replacement |
 |---|---|---|
-| `test_settings_validation` | passed | passed |
+| `test_settings_extra_forbid` | passed | passed |
+| `test_site_strip_whitespace` | passed | passed |
 | `test_site_validation` | passed | passed |
 
-**Verdict: VERIFIED** — no regressions; every baseline problem attributed to this dependency is resolved
+**Verdict: VERIFIED** — no regressions; resolved DEPRECATION_WARNINGS, SPEC_CONFLICT, OUTDATED_PIN
 
 ## Compatibility gaps
 
 - `MEASURED` Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)
-- `AI-SUGGESTED` Pydantic V2 introduces breaking changes in configuration and validation decorators. The migration uses ConfigDict and field_validator.
+- `AI-SUGGESTED` Pydantic v2 is a major rewrite; while the logic in this repository is simple, the migration from 'class Config' to 'ConfigDict' and '@validator' to '@field_validator' is required for full compatibility and to remove warnings.
 
 ## Attempts
 
-- #1 gemma-4-31b-it (google, 245.4s): upgrade → verified
+- #1 gemma-4-31b-it (google, 326.2s): upgrade → verified
 
 ## Open concerns and limitations
 
-- `AI-SUGGESTED` If other parts of the code (not found in AST scan) use Pydantic V1 features, they might break.
+- `AI-SUGGESTED` Pydantic v2 has different internal behavior for some edge cases of validation, though the current usage in this repo is straightforward.
 - `OBSERVED` Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe.
 - `OBSERVED` Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested.

@@ -6,4 +6,64 @@
     "version_spec": "==2.34.2",
     "stdlib_module": null
   },
-  "
+  "rationale": "Upgrading requests to the latest version (2.34.2) to resolve the OLD_PIN risk. Additionally, replacing the use of the private API `requests.utils._parse_content_type_header` with the standard library `email.message.Message` and removing the global monkeypatch of `requests.Session.request` in favor of explicit session configuration to improve stability and maintainability.",
+  "migration_steps": [
+    "Upgrade requests version in pyproject.toml and requirements.txt.",
+    "Replace the private API `requests.utils._parse_content_type_header` with `email.message.Message` in `linkwatch/encoding.py`.",
+    "Move the User-Agent configuration from the monkeypatch in `linkwatch/http_patch.py` to the `fetch` function in `linkwatch/checker.py`.",
+    "Disable the monkeypatch assignment in `linkwatch/http_patch.py`."
+  ],
+  "requirement_changes": [
+    {
+      "action": "set",
+      "package": "requests",
+      "requirement": "requests==2.34.2"
+    }
+  ],
+  "code_edits": [
+    {
+      "file": "linkwatch/encoding.py",
+      "find": "from requests.utils import _parse_content_type_header",
+      "replace": "from email.message import Message",
+      "why": "Replace private requests API with standard library equivalent."
+    },
+    {
+      "file": "linkwatch/encoding.py",
+      "find": "def detect_encoding(resp):\n    _, params = _parse_content_type_header(resp.headers.get(\"Content-Type\", \"\"))\n    charset = params.get(\"charset\")\n    if charset and charset is not True:\n        return charset",
+      "replace": "def detect_encoding(resp):\n    m = Message()\n    m[\"Content-Type\"] = resp.headers.get(\"Content-Type\", \"\")\n    charset = m.get_param(\"charset\")\n    if charset:\n        return charset",
+      "why": "Use email.message.Message to parse the charset from the Content-Type header."
+    },
+    {
+      "file": "linkwatch/checker.py",
+      "find": "def fetch(url):\n    session = S()\n    try:\n        return session.get(url, verify=certifi.where())\n    finally:\n        session.close()",
+      "replace": "def fetch(url):\n    session = S()\n    session.headers.update({\"User-Agent\": \"linkwatch/1.0\"})\n    try:\n        return session.get(url, verify=certifi.where())\n    finally:\n        session.close()",
+      "why": "Explicitly set the User-Agent on the session instead of relying on a global monkeypatch."
+    },
+    {
+      "file": "linkwatch/http_patch.py",
+      "find": "requests.Session.request = _request",
+      "replace": "# Monkeypatch removed in favor of explicit session configuration",
+      "why": "Remove the global monkeypatch to reduce risk."
+    }
+  ],
+  "suggested_tests": [
+    {
+      "name": "test_user_agent_preserved",
+      "purpose": "Ensure the User-Agent is still sent as 'linkwatch/1.0' after removing the monkeypatch.",
+      "code": "def test_user_agent_preserved(server):\n    from linkwatch.checker import fetch\n    resp = fetch(f\"{server}/echo-ua\")\n    assert resp.text == \"linkwatch/1.0\""
+    },
+    {
+      "name": "test_encoding_detection_preserved",
+      "purpose": "Ensure encoding detection still works after replacing the private requests API.",
+      "code": "def test_encoding_detection_preserved(server):\n    from linkwatch.checker import fetch\n    from linkwatch.encoding import detect_encoding\n    \n    # Test explicit charset\n    resp_utf8 = fetch(f\"{server}/ok\")\n    assert detect_encoding(resp_utf8) == \"utf-8\"\n    \n    # Test fallback to chardet (no charset in header)\n    resp_latin1 = fetch(f\"{server}/latin1\")\n    assert detect_encoding(resp_latin1) is not None"
+    }
+  ],
+  "compatibility_notes": [
+    "The User-Agent is now set per-session in `fetch()` rather than globally for all `requests.Session` instances."
+  ],
+  "risks": [
+    "If other parts of the application (not shown in evidence) rely on the global monkeypatch of `requests.Session.request`, they will no longer send the custom User-Agent."
+  ],
+  "confidence": 1.0
+}
+```

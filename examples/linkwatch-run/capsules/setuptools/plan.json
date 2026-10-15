@@ -5,10 +5,10 @@
     "version_spec": null,
     "stdlib_module": "importlib.resources"
   },
-  "rationale": "The package uses `pkg_resources` to locate templates, which is deprecated (DEPRECATION_WARNINGS). The modern standard library replacement is `importlib.resources`. Since `setuptools` is only used for this purpose at runtime, it can be removed from the runtime dependencies.",
+  "rationale": "The repository uses `pkg_resources` from `setuptools` to locate package resources, which is deprecated (DEPRECATION_WARNINGS). In Python 3.9+, `importlib.resources` is the standard library replacement. Since the target Python version is 3.12.14, we can replace `pkg_resources` with `importlib.resources` and remove `setuptools` as a runtime dependency.",
   "migration_steps": [
-    "Replace `pkg_resources.resource_filename` with `importlib.resources.files().joinpath()` in `linkwatch/resources.py`.",
-    "Remove `setuptools` from the runtime dependencies in `pyproject.toml` and `requirements.txt`."
+    "Replace `pkg_resources` imports and calls with `importlib.resources` in `linkwatch/resources.py`.",
+    "Remove `setuptools` from `pyproject.toml` and `requirements.txt` runtime dependencies."
   ],
   "requirement_changes": [
     {
@@ -21,27 +21,27 @@
       "file": "linkwatch/resources.py",
       "find": "import pkg_resources",
       "replace": "import importlib.resources",
-      "why": "Replace deprecated pkg_resources with stdlib importlib.resources"
+      "why": "Replace deprecated pkg_resources with standard library importlib.resources"
     },
     {
       "file": "linkwatch/resources.py",
-      "find": "return pkg_resources.resource_filename(\"linkwatch\", \"templates\")",
-      "replace": "return str(importlib.resources.files(\"linkwatch\").joinpath(\"templates\"))",
-      "why": "Use the modern importlib.resources.files API to locate the templates directory"
+      "find": "    return pkg_resources.resource_filename(\"linkwatch\", \"templates\")",
+      "replace": "    return str(importlib.resources.files(\"linkwatch\").joinpath(\"templates\"))",
+      "why": "Replace pkg_resources.resource_filename with the modern importlib.resources.files API"
     }
   ],
   "suggested_tests": [
     {
       "name": "test_template_dir_is_valid",
-      "purpose": "Ensure template_dir() still returns a valid path to the templates directory",
-      "code": "import os\nfrom linkwatch.resources import template_dir\n\ndef test_template_dir_is_valid():\n    path = template_dir()\n    assert isinstance(path, str)\n    assert os.path.isdir(path)\n    # Check if the expected template file exists in that directory\n    from linkwatch.resources import TEMPLATE_NAME\n    assert os.path.exists(os.path.join(path, TEMPLATE_NAME))"
+      "purpose": "Verify that template_dir() still returns a valid path to the templates directory",
+      "code": "import os\nfrom linkwatch.resources import template_dir\n\ndef test_template_dir_is_valid():\n    path = template_dir()\n    assert os.path.isdir(path)\n    assert path.endswith('templates')"
     }
   ],
   "compatibility_notes": [
-    "importlib.resources.files was introduced in Python 3.9, which is compatible with the project's >=3.10 requirement."
+    "importlib.resources.files().joinpath() returns a Traversable object; converting it to str() ensures compatibility with code expecting a string path, matching the behavior of pkg_resources.resource_filename."
   ],
   "risks": [
-    "If the package is installed in a non-standard way (e.g., as a zip file), importlib.resources.files().joinpath() might return a Traversable object that doesn't resolve to a physical filesystem path via str(). However, for standard pip installations, this is the correct replacement for resource_filename."
+    "If the package is installed in a non-standard way (e.g., some very specific zip-safe configurations), importlib.resources might behave differently than pkg_resources, although it is the officially recommended replacement."
   ],
   "confidence": 1.0
 }

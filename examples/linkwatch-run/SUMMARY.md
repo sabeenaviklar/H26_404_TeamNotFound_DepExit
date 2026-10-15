@@ -1,18 +1,18 @@
 # DepExit run on `https://github.com/rishrek/LinkWatch`
 
-Commit `f52f3930c8` · Python 3.12.14 · AI: gemma-4-31b-it via google · 2026-10-15T07:01:03+00:00
+Commit `f52f3930c8` · Python 3.12.14 · AI: gemma-4-31b-it via google · 2026-10-15T07:21:39+00:00
 
 Baseline tests `MEASURED`: 9 passed / 1 failing
 
 | Dependency | Risk | Score | Status | Proposal |
 |---|---|---|---|---|
-| [Jinja2](capsules/jinja2/CAPSULE.md) | critical | 90 | verified | upgrade Jinja2>=3.1.0 |
+| [Jinja2](capsules/jinja2/CAPSULE.md) | critical | 90 | verified | upgrade Jinja2>=3.1.6 |
 | [nose](capsules/nose/CAPSULE.md) | critical | 66 | verified | remove |
-| [MarkupSafe](capsules/markupsafe/CAPSULE.md) | critical | 60 | verified | upgrade Jinja2>=3.1.2 |
-| [pydantic](capsules/pydantic/CAPSULE.md) | high | 40 | verified | upgrade pydantic>=2.0 |
+| [MarkupSafe](capsules/markupsafe/CAPSULE.md) | critical | 60 | verified | upgrade Jinja2==3.1.4 |
+| [pydantic](capsules/pydantic/CAPSULE.md) | high | 40 | verified | upgrade pydantic>=2 |
 | [toml](capsules/toml/CAPSULE.md) | high | 23 | verified | replace tomllib |
-| [appdirs](capsules/appdirs/CAPSULE.md) | high | 23 | verified | replace platformdirs |
-| [requests](capsules/requests/CAPSULE.md) | medium | 23 | verified | None |
+| [appdirs](capsules/appdirs/CAPSULE.md) | high | 23 | verified | replace platformdirs>=4.0.0 |
+| [requests](capsules/requests/CAPSULE.md) | medium | 23 | verified | upgrade requests==2.34.2 |
 | [setuptools](capsules/setuptools/CAPSULE.md) | medium | 20 | verified | remove importlib.resources |
 | [idna](capsules/idna/CAPSULE.md) | medium | 20 | verified | remove |
 | [certifi](capsules/certifi/CAPSULE.md) | high | 20 | verified | remove |
@@ -23,7 +23,7 @@ Baseline tests `MEASURED`: 9 passed / 1 failing
 | [rich](capsules/rich/CAPSULE.md) | low | 3 | not-required | - |
 | [click](capsules/click/CAPSULE.md) | none | 0 | not-required | - |
 
-All verified plans applied together `MEASURED`: 19 passed / 0 failing (patch: `combined.patch`)
+All verified plans applied together `MEASURED`: 23 passed / 0 failing (patch: `combined.patch`)
 
 ## Limitations
 

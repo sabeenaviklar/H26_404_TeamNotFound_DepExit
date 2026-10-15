@@ -6,10 +6,9 @@
     "version_spec": null,
     "stdlib_module": null
   },
-  "rationale": "The dependency 'idna' is marked as UNUSED (observed:static), meaning it is not imported or invoked anywhere in the codebase. It is likely a transitive dependency of 'requests' (which is declared in the project), and pinning it directly to an outdated version (2.7) is unnecessary and creates a security/maintenance risk.",
+  "rationale": "The dependency 'idna' is marked as UNUSED by both static analysis and AST scan, meaning it is not imported or invoked anywhere in the repository's code. It is a transitive dependency of 'requests' (which is declared in the project), so removing the direct pin allows 'requests' to manage its own compatible version of 'idna', reducing maintenance overhead and removing an outdated pin (2.7).",
   "migration_steps": [
-    "Remove 'idna' from pyproject.toml",
-    "Remove 'idna' from requirements.txt"
+    "Remove 'idna' from pyproject.toml and requirements.txt"
   ],
   "requirement_changes": [
     {
@@ -18,12 +17,18 @@
     }
   ],
   "code_edits": [],
-  "suggested_tests": [],
+  "suggested_tests": [
+    {
+      "name": "test_requests_idna_resolution",
+      "purpose": "Ensure requests still functions for domain-based URLs after removing direct idna pin",
+      "code": "import requests\nfrom requests.models import Request\n\ndef test_requests_request_init():\n    # This checks that requests can handle a URL without crashing,\n    # which involves idna for domain parsing.\n    req = Request('GET', 'http://example.com')\n    assert req.url == 'http://example.com'"
+    }
+  ],
   "compatibility_notes": [
-    "Removing the direct pin allows the package manager to resolve 'idna' to a version compatible with 'requests' (which requires idna >= 2.5, < 4), likely upgrading it to a 3.x version."
+    "Removing the pin allows the environment to install a newer version of idna (e.g., 3.x) as required by requests, which is more compatible with Python 3.12."
   ],
   "risks": [
-    "If 'idna' is used via dynamic imports or an external plugin mechanism not detected by the AST scan, removing it from the direct dependencies might lead to a runtime ImportError if 'requests' is also removed or if the environment is strictly controlled."
+    "If there was a very specific, undocumented reliance on idna 2.7 behavior that static analysis missed, it could cause issues, though this is unlikely for a library like idna."
   ],
   "confidence": 1.0
 }

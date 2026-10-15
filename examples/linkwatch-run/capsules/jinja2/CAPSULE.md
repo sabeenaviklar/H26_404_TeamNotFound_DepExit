@@ -33,24 +33,24 @@ Tags: `OBSERVED` read from files/registries · `MEASURED` produced by execution 
 
 ## Proposed replacement `AI · VERIFIED`
 
-**upgrade** → `Jinja2>=3.1.0` (model confidence 1.0)
+**upgrade** → `Jinja2>=3.1.6` (model confidence 1.0)
 
-The current version of Jinja2 (2.11.3) is incompatible with newer versions of MarkupSafe, leading to IMPORT_FAILS and TEST_FAILURES (ImportError: cannot import name 'soft_unicode' from 'markupsafe'). Upgrading to Jinja2 3.x resolves this issue and provides support for Python 3.12.
+The repository is experiencing critical IMPORT_FAILS and TEST_FAILURES because Jinja2 2.11.3 is incompatible with newer versions of its dependency, markupsafe (which removed 'soft_unicode' in version 2.1.0). Upgrading to Jinja2 3.1.6 resolves this incompatibility and brings the dependency up to date.
 
 - ✓ package 'Jinja2' exists on PyPI `OBSERVED` latest 3.1.6
 
 ## Migration steps `AI · VERIFIED`
 
-1. Upgrade Jinja2 to >=3.1.0 in pyproject.toml and requirements.txt
+1. Upgrade Jinja2 to >=3.1.6 in pyproject.toml and requirements.txt to resolve the markupsafe compatibility issue.
 
 Applied edits `MEASURED`:
-- set `Jinja2>=3.1.0` in pyproject.toml, requirements.txt
+- set `Jinja2>=3.1.6` in pyproject.toml, requirements.txt
 
 Full patch: [`patch.diff`](patch.diff)
 
 ## Suggested tests `AI-SUGGESTED`
 
-- `test_jinja2_import`: Verify that jinja2 and its required components can be imported without the soft_unicode error
+- `test_jinja2_api_compatibility`: Verify that the Jinja2 APIs used in linkwatch/report.py (Environment, FileSystemLoader, select_autoescape) are available and functional in the upgraded version.
 
 ## Executed test results `MEASURED`
 
@@ -60,23 +60,29 @@ Full patch: [`patch.diff`](patch.diff)
 - Warnings attributed to this dependency: 0 before → 0 after
 - `import jinja2` in candidate: ok
 
+| Risk indicator | Resolved by this change? | Re-checked on the changed copy |
+|---|---|---|
+| IMPORT_FAILS | yes | imports cleanly |
+| TEST_FAILURES | yes | attributed failures now pass |
+| OUTDATED_PIN | yes | now 3.1.6 |
+
 | AI-written test | Original dependency | Replacement |
 |---|---|---|
-| `test_jinja2_import` | error (module failed to import) | passed |
+| `test_jinja2_api_compatibility` | error (module failed to import) | passed |
 
-**Verdict: VERIFIED** — no regressions; every baseline problem attributed to this dependency is resolved
+**Verdict: VERIFIED** — no regressions; resolved IMPORT_FAILS, TEST_FAILURES, OUTDATED_PIN
 
 ## Compatibility gaps
 
-- `MEASURED` Behaviour differs: test_jinja2_import error (module failed to import) on the original dependency but passes on the replacement (expected when the original is broken)
-- `AI-SUGGESTED` Jinja2 3.x is generally backward compatible with 2.x for the features used in this project (Environment, FileSystemLoader, select_autoescape).
+- `MEASURED` Behaviour differs: test_jinja2_api_compatibility error (module failed to import) on the original dependency but passes on the replacement (expected when the original is broken)
+- `AI-SUGGESTED` Jinja2 3.x maintains backward compatibility for the core APIs used in this project (Environment, FileSystemLoader, and select_autoescape).
 
 ## Attempts
 
-- #1 gemma-4-31b-it (google, 92.4s): upgrade → verified
+- #1 gemma-4-31b-it (google, 203.7s): upgrade → verified
 
 ## Open concerns and limitations
 
-- `AI-SUGGESTED` Potential changes in template rendering behavior between Jinja2 2.11 and 3.1, although unlikely for basic usage.
+- `AI-SUGGESTED` While the Python API is stable, there is a small risk that existing .j2 templates might behave differently under Jinja2 3.x, although the usage here appears to be basic variable interpolation.
 - `OBSERVED` Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe.
 - `OBSERVED` Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested.
