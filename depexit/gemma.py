@@ -111,13 +111,15 @@ class Gemma:
                 "contents": [{"role": "user", "parts": [{"text": prompt}]}],
                 "generationConfig": {"temperature": self.temperature, "maxOutputTokens": 8192},
             }
-            for attempt in range(4):
+            for attempt in range(6):
                 try:
                     data = self._post(url, body, {"x-goog-api-key": self.key})
                     break
                 except GemmaError as e:
-                    if "HTTP 429" in str(e) or "HTTP 503" in str(e) or "HTTP 500" in str(e):
-                        time.sleep(8 * (attempt + 1))
+                    if any(c in str(e) for c in ("HTTP 429", "HTTP 500", "HTTP 503", "HTTP 504")):
+                        wait = min(60, 10 * (attempt + 1))
+                        print(f"[depexit] Gemini API busy/rate-limited, retrying in {wait}s", flush=True)
+                        time.sleep(wait)
                         continue
                     raise
             else:

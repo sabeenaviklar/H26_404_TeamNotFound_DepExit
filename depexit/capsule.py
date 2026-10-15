@@ -167,10 +167,15 @@ def dependency_capsule(meta: dict, b, p, mig) -> dict:
 def _ai_matrix(ai_t: dict) -> list[dict]:
     if not ai_t:
         return []
-    o = {c["id"]: c["outcome"] for c in (ai_t.get("original") or {}).get("cases", [])}
-    c = {x["id"]: x["outcome"] for x in (ai_t.get("candidate") or {}).get("cases", [])}
-    ids = sorted(set(o) | set(c))
-    return [{"test": i.split("::")[-1], "original": o.get(i), "replacement": c.get(i)} for i in ids]
+    def outcomes(run):
+        cases = (run or {}).get("cases", [])
+        per = {x["id"].split("::")[-1]: x["outcome"] for x in cases if "::" in x["id"]}
+        module_err = next((x for x in cases if "::" not in x["id"] and x["outcome"] != "passed"), None)
+        return per, (f"{module_err['outcome']} (module failed to import)" if module_err else None)
+    o, o_err = outcomes(ai_t.get("original"))
+    c, c_err = outcomes(ai_t.get("candidate"))
+    names = sorted(set(o) | set(c))
+    return [{"test": n, "original": o.get(n, o_err), "replacement": c.get(n, c_err)} for n in names]
 
 
 # ------------------------------------------------------------------ markdown

@@ -130,6 +130,14 @@ def inventory(env: Env) -> dict:
 _WARN_RE = re.compile(r"(?P<file>[^\s:]+\.py):(?P<line>\d+): (?P<cat>\w*Warning): (?P<msg>.+)")
 
 
+_ABS_SITE = re.compile(r"[^\s'\"(]*[/\\]site-packages[/\\]")
+
+
+def short_paths(text: str) -> str:
+    """Strip machine-specific venv prefixes so evidence is portable."""
+    return _ABS_SITE.sub("site-packages/", text or "")
+
+
 def import_probe(env: Env, module: str, cwd: Path) -> dict:
     """Import a module on its own, recording failure and import-time warnings."""
     r = run([env.python, "-W", "always", "-c", f"import {module}"], cwd=cwd, timeout=120)
@@ -138,7 +146,7 @@ def import_probe(env: Env, module: str, cwd: Path) -> dict:
     if not r.ok:
         lines = [l for l in r.stderr.strip().splitlines() if l.strip()]
         err = lines[-1] if lines else f"exit {r.code}"
-    return {"module": module, "ok": r.ok, "error": err,
+    return {"module": module, "ok": r.ok, "error": short_paths(err),
             "traceback_tail": r.tail(12) if not r.ok else "", "warnings": warnings}
 
 
@@ -192,7 +200,7 @@ def _parse_junit(path: Path) -> list[TestCase]:
                 msg = el.get("message", "") or ""
                 detail = (el.text or "")[-4000:]
                 break
-        out.append(TestCase(tid, outcome, msg, detail, float(tc.get("time", 0) or 0)))
+        out.append(TestCase(tid, outcome, short_paths(msg), detail, float(tc.get("time", 0) or 0)))
     return out
 
 

@@ -98,13 +98,15 @@ class _Visitor(ast.NodeVisitor):
     def visit_ImportFrom(self, node):
         if node.level or not node.module or not self._external(node.module):
             return
+        names = []
         for a in node.names:
             dotted = f"{node.module}.{a.name}"
             self.bindings[a.asname or a.name] = dotted
-            kind = "private-api" if a.name.startswith("_") and not a.name.startswith("__") else "from-import"
-            self._add(node, kind, dotted)
-            if kind == "private-api":
-                self._add(node, "from-import", dotted)
+            names.append(a.name)
+            if a.name.startswith("_") and not a.name.startswith("__"):
+                self._add(node, "private-api", dotted)
+        sym = names[0] if len(names) == 1 else "{" + ",".join(names) + "}"
+        self._add(node, "from-import", f"{node.module}.{sym}")
 
     def _resolve(self, node) -> str | None:
         parts = []
