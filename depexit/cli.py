@@ -50,8 +50,21 @@ def find_python(pref: str | None) -> str:
                 return exe
     if sys.version_info[:2] in ((3, 12), (3, 13)):
         return sys.executable
+    if shutil.which("uv"):
+        # uv can provide a managed CPython without touching the system Python
+        for ver in ("3.12", "3.13"):
+            r = envmod.run(["uv", "python", "find", ver], timeout=60)
+            if not r.ok:
+                print(f"[depexit] no Python {ver} found, fetching one with uv ...", flush=True)
+                envmod.run(["uv", "python", "install", ver], timeout=600)
+                r = envmod.run(["uv", "python", "find", ver], timeout=60)
+            if r.ok and r.stdout.strip():
+                exe = _resolve([r.stdout.strip().splitlines()[-1]])
+                if exe:
+                    return exe
     raise SystemExit("Need Python 3.12 or 3.13 for the target repo (LinkWatch does not support 3.14). "
-                     "Install it, then pass --python /path/to/python3.12 (Windows: --python \"py -3.12\")")
+                     "Install it (fastest: install uv, then DepExit fetches 3.12 itself), or pass "
+                     "--python /path/to/python3.12 (Windows: --python \"py -3.12\")")
 
 
 def prepare_target(target: str, work: Path) -> tuple[Path, dict]:
