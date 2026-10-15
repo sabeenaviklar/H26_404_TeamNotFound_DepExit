@@ -15,6 +15,22 @@ DepExit points at a Python repository, finds the dependencies that put it at ris
 
 ---
 
+## Results on LinkWatch
+
+A complete run on the organizer's repository is committed in [`examples/linkwatch-run/`](examples/linkwatch-run/). Open [`report.html`](examples/linkwatch-run/report.html) after cloning, or read [`SUMMARY.md`](examples/linkwatch-run/SUMMARY.md) on GitHub. It was produced on 15 October 2026 on a MacBook Air with Python 3.12 and `gemma-4-31b-it` through the Gemini API, and took 13 minutes.
+
+| Measure | Result |
+|---|---|
+| Dependencies analysed | 16 |
+| At risk | 10: Jinja2, nose, MarkupSafe, pydantic, toml, appdirs, requests, setuptools, idna, certifi |
+| Gemma 4 plans verified by execution | 10 of 10, each re-checked indicator by indicator |
+| LinkWatch's tests before | 9 of 10 passing, 1 warning |
+| All verified plans applied together | 23 of 23 passing (10 original + 13 written by Gemma), 0 warnings |
+
+What Gemma proposed, in its own patches: Jinja2 upgraded past the MarkupSafe break, nose removed from the Makefile and requirements, pydantic ported to V2 (`field_validator`, `ConfigDict`), `toml` replaced by `tomllib`, `appdirs` by `platformdirs`, `pkg_resources` by `importlib.resources`, the private `requests` helper replaced with `email.message` and the global monkeypatch removed, the unused `idna` pin dropped, and the undeclared `certifi` import removed. Every plan's prompt, raw response and patch is in its capsule folder.
+
+One honest note: an earlier run marked `requests` verified although Gemma's reply had been truncated and nothing was changed. We found it by reading our own capsule, fixed the parser and added plan validation and per-indicator re-checks (see commit history), and re-ran. The committed run is the fixed one.
+
 ## 1. Problem and solution overview
 
 Maintainers usually find out a dependency is rotten when something breaks. The target repository for this challenge, [rishrek/LinkWatch](https://github.com/rishrek/LinkWatch), is a good example. When you install it exactly as its README says on Python 3.12, one of its ten tests already fails, its `make test-nose` target crashes, and several more problems sit quietly in the manifests waiting for the next upgrade. An AI assistant can suggest fixes for all of this, but a suggestion is not evidence, and a wrong migration in a healthy project is worse than no migration at all.
