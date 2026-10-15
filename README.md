@@ -134,7 +134,7 @@ Each capsule contains the fields the challenge asks for: dependency details, ris
 
 | Command | Purpose |
 |---|---|
-| `analyze [TARGET]` | Full pipeline. Options: `--ai auto\|google\|ollama\|none`, `--model`, `--only a,b`, `--max-deps N`, `--attempts N` (default 2), `--parallel N` (default 3), `--python`, `--installer auto\|pip\|uv`, `--out DIR`, `--no-pyproject-check` |
+| `analyze [TARGET]` | Full pipeline. Options: `--ai auto\|google\|ollama\|none`, `--model`, `--only a,b`, `--all` (also migrate low-risk findings), `--max-deps N`, `--attempts N` (default 2), `--parallel N` (default 3), `--python`, `--installer auto\|pip\|uv`, `--out DIR`, `--no-pyproject-check` |
 | `replay CAPSULE [TARGET]` | Apply a capsule's saved plan to a fresh checkout and verify it again. Exit code 0 only if still verified. |
 | `doctor` | Pre-flight check of everything a run needs, including one real Gemma call. |
 | `render DIR` | Rebuild `report.html` from a finished run's capsules without re-running anything. |

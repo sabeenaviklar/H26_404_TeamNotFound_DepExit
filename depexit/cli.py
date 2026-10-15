@@ -191,7 +191,12 @@ def cmd_analyze(args) -> int:
         log(f"  {'*' if p.at_risk else ' '} {p.name:<18} {p.level:<8} {p.score:>3}  {ids}")
 
     only = {x.strip().lower() for x in args.only.split(",")} if args.only else None
-    selected = [p for p in ranked if (p.key in only if only else p.at_risk)]
+    if only:
+        selected = [p for p in ranked if p.key in only]
+    elif args.all:
+        selected = [p for p in ranked if p.indicators]
+    else:
+        selected = [p for p in ranked if p.at_risk]
     if args.max_deps:
         selected = selected[:args.max_deps]
 
@@ -324,6 +329,8 @@ def main(argv=None) -> int:
     a.add_argument("--model", help="model id (default gemma-4-31b-it for google, gemma4 for ollama)")
     a.add_argument("--ollama-url", default="http://localhost:11434")
     a.add_argument("--only", help="comma-separated dependency names to migrate (default: all at-risk)")
+    a.add_argument("--all", action="store_true",
+                   help="migrate every dependency with at least one finding, not only the at-risk ones")
     a.add_argument("--max-deps", type=int, default=0)
     a.add_argument("--attempts", type=int, default=2, help="plan + repair attempts per dependency (default 2)")
     a.add_argument("--parallel", type=int, default=3, help="dependencies migrated concurrently (default 3)")
