@@ -25,15 +25,33 @@ def log(msg: str) -> None:
     print(f"[depexit {time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
+def _resolve(cmd: list[str]) -> str | None:
+    """Return the real interpreter path for a launcher command, if it is 3.12 or 3.13."""
+    r = envmod.run([*cmd, "-c", "import sys; print(sys.executable); print('%d.%d' % sys.version_info[:2])"], timeout=30)
+    if not r.ok:
+        return None
+    lines = r.stdout.strip().splitlines()
+    return lines[0] if len(lines) == 2 and lines[1] in ("3.12", "3.13") else None
+
+
 def find_python(pref: str | None) -> str:
+    """Find a Python 3.12/3.13 for the target. Accepts paths or launchers like 'py -3.12'."""
+    import shlex
     if pref:
-        return pref
-    for name in ("python3.12", "python3.13"):
-        if shutil.which(name):
-            return name
+        exe = _resolve(shlex.split(pref, posix=os.name != "nt"))
+        if not exe:
+            raise SystemExit(f"--python {pref!r} is not a working Python 3.12 or 3.13 interpreter")
+        return exe
+    candidates = [["python3.12"], ["python3.13"], ["py", "-3.12"], ["py", "-3.13"]]
+    for cmd in candidates:
+        if shutil.which(cmd[0]):
+            exe = _resolve(cmd)
+            if exe:
+                return exe
     if sys.version_info[:2] in ((3, 12), (3, 13)):
         return sys.executable
-    raise SystemExit("Need Python 3.12 or 3.13 for the target repo. Pass --python /path/to/python3.12")
+    raise SystemExit("Need Python 3.12 or 3.13 for the target repo (LinkWatch does not support 3.14). "
+                     "Install it, then pass --python /path/to/python3.12 (Windows: --python \"py -3.12\")")
 
 
 def prepare_target(target: str, work: Path) -> tuple[Path, dict]:
