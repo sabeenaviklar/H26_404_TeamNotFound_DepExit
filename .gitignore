@@ -13,3 +13,6 @@ status.html
 capsule-out/
 replay-out/
 .env
+demo-out/
+pt-out/
+*-out/
