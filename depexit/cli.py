@@ -220,8 +220,9 @@ def cmd_doctor(args) -> int:
         if g is None:
             line(False, "Gemma", "AI disabled (set GEMINI_API_KEY or use --ai ollama)")
         else:
-            ex = g.ask_json('Reply with exactly this JSON: {"status": "ok", "model": "<your model name>"}')
-            line(ex.parsed is not None, f"Gemma call via {g.label}", f"{ex.seconds}s -> {ex.raw_response.strip()[:120]}")
+            ex = g.ask_json('Reply with exactly this JSON and nothing else: {"status": "ok"}')
+            line(ex.parsed is not None, f"Gemma call answered by {g.label} (model id from the API request)",
+                 f"{ex.seconds}s -> {ex.raw_response.strip()[:120]}")
     except Exception as e:  # noqa: BLE001 - doctor reports everything
         line(False, "Gemma call", str(e)[:300])
     print("ready" if ok else "fix the XX items above")
