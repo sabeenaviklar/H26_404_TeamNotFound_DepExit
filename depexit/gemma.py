@@ -153,12 +153,13 @@ class Gemma:
                 return self._post(url, body, {"x-goog-api-key": self.key})
             except GemmaError as e:
                 msg = str(e)
-                if "HTTP 400" in msg and "instruction" in msg.lower() and "systemInstruction" in body:
+                bad_request_for_system = "HTTP 400" in msg and "instruction" in msg.lower()
+                if (bad_request_for_system or ("HTTP 500" in msg and attempt == 0)) and "systemInstruction" in body:
                     # some hosted Gemma versions reject system instructions: fold them into the prompt
                     sys_text = body.pop("systemInstruction")["parts"][0]["text"]
                     first = body["contents"][0]["parts"][0]
                     first["text"] = sys_text + "\n\n" + first["text"]
-                    print(f"[depexit] {model}: system instruction not supported, sending it inline", flush=True)
+                    print(f"[depexit] {model}: {_api_reason(msg)} -> resending with the system prompt inline", flush=True)
                     self.inline_system = True
                     continue
                 transient = any(c in msg for c in ("HTTP 429", "HTTP 500", "HTTP 503", "HTTP 504"))
