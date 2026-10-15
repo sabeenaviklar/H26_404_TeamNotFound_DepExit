@@ -141,8 +141,15 @@ def cmd_analyze(args) -> int:
     migrations = {}
     if gemma and selected:
         log(f"asking {gemma.label} for migration plans: {', '.join(p.name for p in selected)}")
-        for p in selected:
-            migrations[p.key] = migrate(b, p, gemma, python_cmd, installer, args.attempts, log)
+        from concurrent.futures import ThreadPoolExecutor
+        workers = max(1, min(args.parallel, len(selected)))
+        if workers > 1:
+            log(f"running {workers} dependencies in parallel (isolated copies and venvs; --parallel 1 to serialise)")
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures = {p.key: pool.submit(migrate, b, p, gemma, python_cmd, installer, args.attempts, log)
+                       for p in selected}
+            for key, fut in futures.items():
+                migrations[key] = fut.result()
     comb = combined(b, list(migrations.values()), python_cmd, installer, log) if migrations else None
 
     meta = {"target": target, "settings": {
@@ -248,6 +255,7 @@ def main(argv=None) -> int:
     a.add_argument("--only", help="comma-separated dependency names to migrate (default: all at-risk)")
     a.add_argument("--max-deps", type=int, default=0)
     a.add_argument("--attempts", type=int, default=2, help="plan + repair attempts per dependency (default 2)")
+    a.add_argument("--parallel", type=int, default=3, help="dependencies migrated concurrently (default 3)")
     a.add_argument("--no-pyproject-check", action="store_true", help="skip the second install via pyproject.toml")
     common(a)
     a.set_defaults(func=cmd_analyze)

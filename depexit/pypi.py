@@ -30,7 +30,9 @@ def _get_json(url: str, cache: Path, headers: dict | None = None, timeout: int =
         data = {"_error": f"HTTP {e.code}"}
     except (urllib.error.URLError, TimeoutError, OSError) as e:
         return {"_error": f"network: {e}"}  # not cached, may be transient
-    cache.write_text(json.dumps(data), encoding="utf-8")
+    tmp = cache.with_suffix(f".{os.getpid()}.{id(data)}.tmp")
+    tmp.write_text(json.dumps(data), encoding="utf-8")
+    os.replace(tmp, cache)   # atomic: parallel workers never see half-written files
     return data
 
 
