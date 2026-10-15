@@ -17,6 +17,7 @@ h1{font-size:26px;letter-spacing:-.02em;margin:0 0 6px}h2{font-size:17px;margin:
 h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:22px 0 8px;display:flex;gap:8px;align-items:center}
 .meta{color:var(--mute);font-size:13px}code,.mono{font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 code{background:var(--code);padding:1px 5px;border-radius:4px}
+a{color:var(--obs);text-decoration:none;font-weight:600}a:hover{text-decoration:underline}
 .tag{display:inline-block;font:600 10.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.04em;padding:4px 6px;border-radius:4px;white-space:nowrap;vertical-align:middle}
 .t-observed{color:var(--obs);background:var(--obs-bg)}.t-measured{color:var(--mea);background:var(--mea-bg)}
 .t-ai{color:var(--ai);background:var(--ai-bg)}.t-verified{color:var(--ver);background:var(--ver-bg)}
@@ -196,7 +197,7 @@ def page(s: dict, caps: list[dict]) -> str:
 <div class="stats">
 <div class="stat"><b>{counts(t)}</b><span>baseline test suite {tag("measured")}</span></div>
 <div class="stat"><b>{at_risk} / {len(deps)}</b><span>dependencies at risk {tag("observed")}</span></div>
-<div class="stat"><b>{verified} / {attempted}</b><span>migrations verified by execution</span></div>
+<div class="stat"><b>{verified} / {attempted}</b><span>{"migrations verified by execution" if s["ai"] != "off" else "migrations verified (AI was off for this run)"}</span></div>
 <div class="stat"><b>{counts(ct) if ct else "–"}</b><span>all verified plans applied together</span></div>
 </div>
 <h2>Dependencies</h2>

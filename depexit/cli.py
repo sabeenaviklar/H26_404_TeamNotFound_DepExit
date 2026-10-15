@@ -199,6 +199,19 @@ def cmd_replay(args) -> int:
     return 0 if a.verdict == "verified" else 1
 
 
+def cmd_render(args) -> int:
+    """Rebuild report.html from a finished run's capsules, without re-running anything."""
+    from .report_html import page
+    out = Path(args.dir).resolve()
+    index = json.loads((out / "capsule-index.json").read_text(encoding="utf-8"))
+    caps = []
+    for d in index["dependencies"]:
+        caps.append(json.loads((out / d["capsule"]).read_text(encoding="utf-8")))
+    (out / "report.html").write_text(page(index, caps), encoding="utf-8")
+    log(f"rebuilt {out / 'report.html'} from {len(caps)} capsules")
+    return 0
+
+
 def cmd_doctor(args) -> int:
     """Pre-flight check: interpreters, git, registry access and a tiny Gemma call."""
     ok = True
@@ -265,6 +278,10 @@ def main(argv=None) -> int:
     r.add_argument("target", nargs="?", help="repo to verify against (default: the capsule's original target)")
     common(r)
     r.set_defaults(func=cmd_replay, out="replay-out")
+
+    rr = sub.add_parser("render", help="rebuild report.html from an existing run folder (no re-run)")
+    rr.add_argument("dir", help="a run folder, e.g. capsule-out or examples/linkwatch-run")
+    rr.set_defaults(func=cmd_render)
 
     d = sub.add_parser("doctor", help="check interpreters, network and Gemma access before a run")
     d.add_argument("--python")
