@@ -231,6 +231,7 @@ def pytest(env: Env, repo: Path, label: str, junit: Path, targets: list[str] | N
 
 
 _SITE_RE = re.compile(r"site-packages[/\\]([A-Za-z0-9_]+)")
+_FRAME_RE = re.compile(r"site-packages[/\\]([A-Za-z0-9_]+)[^\s:]*\.py:\d+")
 _FROM_RE = re.compile(r"(?:from|module) '([A-Za-z0-9_\.]+)'")
 _NAMED_RE = re.compile(r"No module named '([A-Za-z0-9_\.]+)'")
 
@@ -243,7 +244,7 @@ def modules_in_traceback(text: str) -> list[str]:
     the exception message itself are returned.
     """
     mods = []
-    frames = [m.group(1) for m in _SITE_RE.finditer(text)]
+    frames = [m.group(1) for m in _FRAME_RE.finditer(text)] or [m.group(1) for m in _SITE_RE.finditer(text)]
     if frames:
         mods.append(frames[-1])
     for rx in (_FROM_RE, _NAMED_RE):
