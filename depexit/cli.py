@@ -161,6 +161,42 @@ def cmd_replay(args) -> int:
     return 0 if a.verdict == "verified" else 1
 
 
+def cmd_doctor(args) -> int:
+    """Pre-flight check: interpreters, git, registry access and a tiny Gemma call."""
+    ok = True
+
+    def line(good, what, detail=""):
+        nonlocal ok
+        ok &= bool(good)
+        print(f"  [{'ok' if good else 'XX'}] {what}{(' - ' + detail) if detail else ''}")
+
+    print(f"DepExit {__version__} doctor (running on Python {sys.version.split()[0]})")
+    line(sys.version_info >= (3, 11), "DepExit runs on Python >= 3.11")
+    try:
+        py = find_python(args.python)
+        r = envmod.run([py, "--version"])
+        line(r.ok, f"target interpreter {py}", (r.stdout or r.stderr).strip())
+    except SystemExit as e:
+        line(False, "target interpreter", str(e))
+    line(shutil.which("git"), "git available")
+    line(True, f"installer: {envmod.pick_installer('auto')}", "uv is faster; pip works")
+    from . import pypi
+    import tempfile
+    exists, latest = pypi.exists("jinja2", Path(tempfile.mkdtemp()))
+    line(exists, "PyPI JSON API reachable", f"jinja2 latest {latest}" if exists else "")
+    try:
+        g = make_gemma(args)
+        if g is None:
+            line(False, "Gemma", "AI disabled (set GEMINI_API_KEY or use --ai ollama)")
+        else:
+            ex = g.ask_json('Reply with exactly this JSON: {"status": "ok", "model": "<your model name>"}')
+            line(ex.parsed is not None, f"Gemma call via {g.label}", f"{ex.seconds}s -> {ex.raw_response.strip()[:120]}")
+    except Exception as e:  # noqa: BLE001 - doctor reports everything
+        line(False, "Gemma call", str(e)[:300])
+    print("ready" if ok else "fix the XX items above")
+    return 0 if ok else 1
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="depexit", description="Evidence-first dependency exit planning with Gemma 4.")
     ap.add_argument("--version", action="version", version=f"depexit {__version__}")
@@ -189,6 +225,13 @@ def main(argv=None) -> int:
     r.add_argument("target", nargs="?", help="repo to verify against (default: the capsule's original target)")
     common(r)
     r.set_defaults(func=cmd_replay, out="replay-out")
+
+    d = sub.add_parser("doctor", help="check interpreters, network and Gemma access before a run")
+    d.add_argument("--python")
+    d.add_argument("--ai", default="auto", choices=["auto", "google", "ollama", "none"])
+    d.add_argument("--model")
+    d.add_argument("--ollama-url", default="http://localhost:11434")
+    d.set_defaults(func=cmd_doctor)
 
     args = ap.parse_args(argv)
     return args.func(args)

@@ -20,7 +20,7 @@ from . import pypi
 from .analyze import Baseline, DepProfile, _attribute_warning
 from .gemma import Gemma, GemmaError, plan_prompt, repair_prompt
 from .manifest import normalize, parse_requirement
-from .scan import SKIP_DIRS, file_context, scan
+from .scan import SKIP_DIRS, scan, text_references
 
 MAX_FILE_LINES = 400
 
@@ -374,6 +374,9 @@ def verify(b: Baseline, p: DepProfile, plan: dict, work: Path, python_cmd: str, 
         old = set(p.modules) or {p.key.replace("-", "_")}
         a.residual_usages = [{"file": u.file, "line": u.line, "code": u.code}
                              for u in s.usages if u.module in old and u.kind in ("import", "from-import")]
+        words = {m: {m, *p.console_scripts} for m in old}
+        a.residual_usages += [{"file": u.file, "line": u.line, "code": u.code}
+                              for u in text_references(root, words)]
 
     # repository's own tests (AI tests excluded, so the comparison is like for like)
     targets = ["--ignore", ai_rel] if ai_rel else []
