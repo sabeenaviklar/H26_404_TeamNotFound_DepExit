@@ -18,6 +18,8 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 
+from .net import ssl_context
+
 DEFAULT_MODEL = {"google": "gemma-4-31b-it", "ollama": "gemma4"}
 
 SYSTEM = """You are a careful Python dependency-migration engineer working inside an automated tool.
@@ -95,7 +97,7 @@ class Gemma:
         req = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"),
                                      headers={"Content-Type": "application/json", **headers})
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            with urllib.request.urlopen(req, timeout=self.timeout, context=ssl_context()) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             detail = e.read().decode("utf-8", "replace")[:600]

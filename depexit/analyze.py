@@ -239,7 +239,10 @@ def _profiles(repo, man, sres, env, dists, mod_to_dist, tests, alt, work, log):
     cache = work / "registry-cache"
     for p in profiles.values():
         p.registry = pypi.package_facts(p.name, p.installed_version, cache)
-    log(f"registry metadata fetched for {len(profiles)} packages")
+    missing = [p.name for p in profiles.values() if not p.registry.get("available")]
+    log(f"registry metadata fetched for {len(profiles) - len(missing)}/{len(profiles)} packages"
+        + (f"; UNAVAILABLE for {', '.join(missing)}: {next(iter(profiles.values())).registry.get('error', '')}"
+           if missing else ""))
 
     conflicts = {c["package"]: c for c in spec_conflicts(man)}
     for p in profiles.values():

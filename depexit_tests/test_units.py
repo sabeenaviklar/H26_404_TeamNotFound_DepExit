@@ -142,3 +142,24 @@ def test_requirement_changes_edit_txt_and_pyproject(tmp_path):
     assert "certifi>=2024.2.2" in (repo / "requirements.txt").read_text()
     assert "certifi" not in (repo / "requirements-dev.txt").read_text()
     assert '"certifi>=2024.2.2",' in (repo / "pyproject.toml").read_text()
+
+
+def test_ssl_context_falls_back_to_a_ca_bundle_when_store_is_empty(monkeypatch):
+    """Simulates python.org macOS builds that ship without root certificates."""
+    import ssl
+    from depexit import net
+    real = ssl.create_default_context
+
+    def fake(cafile=None, **kw):
+        if cafile is None:
+            return ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)   # empty trust store
+        return real(cafile=cafile)
+    monkeypatch.setattr(ssl, "create_default_context", fake)
+    monkeypatch.delenv("SSL_CERT_FILE", raising=False)
+    net.ssl_context.cache_clear()
+    try:
+        ctx = net.ssl_context()
+        assert ctx.verify_mode == ssl.CERT_REQUIRED           # verification never disabled
+        assert ctx.cert_store_stats()["x509_ca"] > 0          # a real bundle was loaded
+    finally:
+        net.ssl_context.cache_clear()

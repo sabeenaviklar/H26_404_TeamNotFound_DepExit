@@ -13,6 +13,8 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .net import ssl_context
+
 UA = "depexit/0.1 (+https://github.com)"
 
 
@@ -22,7 +24,7 @@ def _get_json(url: str, cache: Path, headers: dict | None = None, timeout: int =
         return json.loads(cache.read_text(encoding="utf-8"))
     req = urllib.request.Request(url, headers={"User-Agent": UA, **(headers or {})})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with urllib.request.urlopen(req, timeout=timeout, context=ssl_context()) as resp:
             data = json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         data = {"_error": f"HTTP {e.code}"}
