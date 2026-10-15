@@ -1,0 +1,28 @@
+{
+  "decision": "remove",
+  "replacement": {
+    "package": null,
+    "version_spec": null,
+    "stdlib_module": null
+  },
+  "rationale": "The dependency 'idna' is marked as UNUSED (observed:static), meaning it is not imported or invoked anywhere in the codebase. It is likely a transitive dependency of 'requests' (which is declared in the project), and pinning it directly to an outdated version (2.7) is unnecessary and creates a security/maintenance risk.",
+  "migration_steps": [
+    "Remove 'idna' from pyproject.toml",
+    "Remove 'idna' from requirements.txt"
+  ],
+  "requirement_changes": [
+    {
+      "action": "remove",
+      "package": "idna"
+    }
+  ],
+  "code_edits": [],
+  "suggested_tests": [],
+  "compatibility_notes": [
+    "Removing the direct pin allows the package manager to resolve 'idna' to a version compatible with 'requests' (which requires idna >= 2.5, < 4), likely upgrading it to a 3.x version."
+  ],
+  "risks": [
+    "If 'idna' is used via dynamic imports or an external plugin mechanism not detected by the AST scan, removing it from the direct dependencies might lead to a runtime ImportError if 'requests' is also removed or if the environment is strictly controlled."
+  ],
+  "confidence": 1.0
+}

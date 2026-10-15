@@ -1,0 +1,52 @@
+
+
+--- retry ---
+```json
+{
+  "decision": "upgrade",
+  "replacement": {
+    "package": "Jinja2",
+    "version_spec": ">=3.1.2",
+    "stdlib_module": null
+  },
+  "rationale": "The observed 'ImportError: cannot import name 'soft_unicode' from 'markupsafe'' is a known incompatibility between Jinja2 versions prior to 3.0 and MarkupSafe versions 2.1.0 and later. The repository is currently pinned to Jinja2 2.11.3, while the environment has MarkupSafe 3.0.4. Upgrading Jinja2 to >= 3.1.2 resolves this issue and ensures compatibility with Python 3.12.",
+  "migration_steps": [
+    "Upgrade Jinja2 to >= 3.1.2 in pyproject.toml and requirements.txt to resolve the incompatibility with MarkupSafe 3.0.4."
+  ],
+  "requirement_changes": [
+    {
+      "action": "set",
+      "package": "Jinja2",
+      "requirement": "Jinja2>=3.1.2"
+    }
+  ],
+  "code_edits": [
+    {
+      "file": "pyproject.toml",
+      "find": "\"Jinja2==2.11.3\",",
+      "replace": "\"Jinja2>=3.1.2\",",
+      "why": "Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12."
+    },
+    {
+      "file": "requirements.txt",
+      "find": "Jinja2==2.11.3",
+      "replace": "Jinja2>=3.1.2",
+      "why": "Upgrade Jinja2 to a version compatible with MarkupSafe 3.0.4 and Python 3.12."
+    }
+  ],
+  "suggested_tests": [
+    {
+      "name": "test_jinja2_basic_rendering",
+      "purpose": "Verify that Jinja2 still renders basic templates correctly after the upgrade.",
+      "code": "import pytest\nfrom jinja2 import Template\n\ndef test_jinja2_basic_rendering():\n    template = Template(\"Hello {{ name }}!\")\n    result = template.render(name=\"World\")\n    assert result == \"Hello World!\""
+    }
+  ],
+  "compatibility_notes": [
+    "Jinja2 3.x is generally backward compatible with 2.x for basic template rendering, which is the primary use case in this repository."
+  ],
+  "risks": [
+    "While basic rendering is stable, any advanced Jinja2 2.11 specific internal APIs used by the project (though none were found in the AST scan) might have changed in 3.x."
+  ],
+  "confidence": 1.0
+}
+```

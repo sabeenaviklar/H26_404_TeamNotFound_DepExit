@@ -1,0 +1,390 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "pydantic",
+    "key": "pydantic",
+    "relation": "direct",
+    "installed_version": "1.10.13",
+    "declared": [
+      {
+        "file": "requirements.txt",
+        "line": 5,
+        "spec": "==1.10.13",
+        "group": "runtime",
+        "raw": "pydantic==1.10.13"
+      },
+      {
+        "file": "pyproject.toml",
+        "line": 17,
+        "spec": ">=2",
+        "group": "runtime",
+        "raw": "pydantic>=2"
+      }
+    ],
+    "import_names": [
+      "pydantic"
+    ],
+    "console_scripts": []
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "high",
+    "score": 40,
+    "at_risk": true,
+    "indicators": [
+      {
+        "id": "DEPRECATION_WARNINGS",
+        "severity": "medium",
+        "title": "1 warning(s) raised during the test run",
+        "evidence": "site-packages/pydantic/_internal/_config.py:408 UserWarning: Valid config keys have changed in V2: (run: pyproject-install)",
+        "provenance": "measured:execution"
+      },
+      {
+        "id": "SPEC_CONFLICT",
+        "severity": "high",
+        "title": "Declared with different version constraints in different manifests",
+        "evidence": "requirements.txt:5 ==1.10.13; pyproject.toml:17 >=2; installing via pyproject resolves to 2.14.1 vs 1.10.13 via requirements",
+        "provenance": "observed:static"
+      },
+      {
+        "id": "OUTDATED_PIN",
+        "severity": "medium",
+        "title": "Pinned 1 major version(s) behind latest",
+        "evidence": "pinned 1.10.13 (2023-09-27), latest 2.14.1",
+        "provenance": "observed:registry"
+      }
+    ]
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "linkwatch/config.py",
+        "line": 4,
+        "kind": "from-import",
+        "module": "pydantic",
+        "symbol": "pydantic.{BaseModel,validator}",
+        "code": "from pydantic import BaseModel, validator"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "line": 7,
+        "kind": "reference",
+        "module": "pydantic",
+        "symbol": "pydantic.BaseModel",
+        "code": "class Site(BaseModel):"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "line": 14,
+        "kind": "reference",
+        "module": "pydantic",
+        "symbol": "pydantic.validator",
+        "code": "@validator(\"name\")"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "line": 20,
+        "kind": "reference",
+        "module": "pydantic",
+        "symbol": "pydantic.validator",
+        "code": "@validator(\"url\")"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "line": 27,
+        "kind": "reference",
+        "module": "pydantic",
+        "symbol": "pydantic.BaseModel",
+        "code": "class Settings(BaseModel):"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "pydantic",
+    "available": true,
+    "summary": "Data validation using Python type hints",
+    "license": "MIT",
+    "latest_version": "2.14.1",
+    "latest_release_date": "2026-10-11",
+    "days_since_latest_release": 3,
+    "installed_version": "1.10.13",
+    "installed_release_date": "2023-09-27",
+    "installed_age_days": 1113,
+    "installed_yanked": false,
+    "newer_releases_count": 76,
+    "major_versions_behind": 1,
+    "requires_python_latest": ">=3.10",
+    "inactive_classifier": false,
+    "python_classifiers": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13",
+      "3.14",
+      "3.15"
+    ],
+    "github": "sponsors/samuelcolvin",
+    "source_url": "https://pypi.org/project/pydantic/",
+    "repo_lookup": "HTTP 403"
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "pydantic",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": [
+      {
+        "file": "site-packages/pydantic/_internal/_config.py",
+        "line": "408",
+        "cat": "UserWarning",
+        "msg": "Valid config keys have changed in V2:",
+        "run": "pyproject-install"
+      }
+    ]
+  },
+  "status": "verified",
+  "proposed_replacement": {
+    "provenance": "verified",
+    "decision": "upgrade",
+    "package": "pydantic",
+    "version_spec": ">=2.0",
+    "stdlib_module": null,
+    "rationale": "The repository has a SPEC_CONFLICT between requirements.txt (==1.10.13) and pyproject.toml (>=2). The installed version is 1.10.13, but the code is triggering V2 deprecation warnings during installation/execution. Upgrading to Pydantic V2 aligns the manifests and removes the risk of using an outdated major version.",
+    "model_confidence": 1.0,
+    "plan_checks": [
+      {
+        "check": "package 'pydantic' exists on PyPI",
+        "passed": true,
+        "detail": "latest 2.14.1"
+      }
+    ]
+  },
+  "migration_steps": {
+    "provenance": "verified",
+    "steps": [
+      "Update pydantic version in requirements.txt to match pyproject.toml (>=2.0).",
+      "Update linkwatch/config.py to use Pydantic V2 syntax: replace 'validator' with 'field_validator', 'class Config' with 'model_config = ConfigDict(...)', and add '@classmethod' to validators."
+    ],
+    "code_edits": [
+      {
+        "file": "linkwatch/config.py",
+        "why": "Import V2 replacements for validator and Config",
+        "applied": true,
+        "reason": "exact match"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "why": "Migrate V1 Config to V2 ConfigDict",
+        "applied": true,
+        "reason": "exact match"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "why": "Migrate V1 validator to V2 field_validator",
+        "applied": true,
+        "reason": "exact match"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "why": "Migrate V1 validator to V2 field_validator",
+        "applied": true,
+        "reason": "exact match"
+      },
+      {
+        "file": "linkwatch/config.py",
+        "why": "Migrate V1 Config to V2 ConfigDict",
+        "applied": true,
+        "reason": "exact match"
+      }
+    ],
+    "requirement_changes": [
+      {
+        "change": {
+          "action": "set",
+          "package": "pydantic",
+          "requirement": "pydantic>=2.0"
+        },
+        "files": [
+          "pyproject.toml",
+          "requirements.txt"
+        ],
+        "applied": true
+      }
+    ],
+    "patch_file": "patch.diff"
+  },
+  "suggested_tests": {
+    "provenance": "ai",
+    "tests": [
+      {
+        "name": "test_pydantic_v2_migration",
+        "purpose": "Verify that Site and Settings validation still works as expected with Pydantic V2"
+      }
+    ],
+    "file": "tests/test_depexit_pydantic.py",
+    "executed": true
+  },
+  "executed_test_results": {
+    "provenance": "measured",
+    "install": {
+      "ok": true,
+      "seconds": 0.5,
+      "output": " + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==2.14.1\n + pydantic-core==2.50.1\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.8.0",
+      "pip_check_ok": true,
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/pydantic/attempt-1/venv\nChecked 29 packages in 0.79ms\nAll installed packages are compatible"
+    },
+    "candidate_versions": {
+      "idna": "2.7",
+      "click": "8.5.0",
+      "packaging": "26.3",
+      "toml": "0.10.2",
+      "Pygments": "2.21.0",
+      "rich": "15.0.0",
+      "Jinja2": "2.11.3",
+      "iniconfig": "2.3.1",
+      "appdirs": "1.4.4",
+      "nose": "1.3.7",
+      "pip": "26.2.1",
+      "pytest": "9.1.1",
+      "requests": "2.31.0",
+      "urllib3": "2.8.0",
+      "pydantic_core": "2.50.1",
+      "mdurl": "0.1.2",
+      "python-dateutil": "2.9.0.post0",
+      "chardet": "5.2.0",
+      "certifi": "2026.7.22",
+      "annotated-types": "0.8.0",
+      "markdown-it-py": "4.2.0",
+      "typing-inspection": "0.4.4",
+      "pluggy": "1.6.0",
+      "setuptools": "75.8.0",
+      "typing_extensions": "4.16.0",
+      "MarkupSafe": "3.0.4",
+      "pydantic": "2.14.1",
+      "charset-normalizer": "3.5.2",
+      "six": "1.17.0"
+    },
+    "import_probes": [
+      {
+        "module": "pydantic",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "residual_usages_of_old_package": [],
+    "repository_tests": {
+      "baseline": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "fixed": [],
+      "regressions": {},
+      "still_failing": {
+        "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+      },
+      "missing": []
+    },
+    "ai_written_tests": {
+      "against_original_dependency": {
+        "passed": 2,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "against_replacement": {
+        "passed": 2,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "per_test": [
+        {
+          "test": "test_settings_validation",
+          "original": "passed",
+          "replacement": "passed"
+        },
+        {
+          "test": "test_site_validation",
+          "original": "passed",
+          "replacement": "passed"
+        }
+      ]
+    },
+    "warnings_attributed_before": 0,
+    "warnings_attributed_after": 0,
+    "verdict": "verified",
+    "verdict_reasons": [
+      "no regressions; every baseline problem attributed to this dependency is resolved"
+    ]
+  },
+  "compatibility_gaps": [
+    {
+      "provenance": "measured",
+      "text": "Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+    },
+    {
+      "provenance": "ai",
+      "text": "Pydantic V2 introduces breaking changes in configuration and validation decorators. The migration uses ConfigDict and field_validator."
+    }
+  ],
+  "open_concerns": [
+    {
+      "provenance": "ai",
+      "text": "If other parts of the code (not found in AST scan) use Pydantic V1 features, they might break."
+    },
+    {
+      "provenance": "observed",
+      "text": "Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe."
+    },
+    {
+      "provenance": "observed",
+      "text": "Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested."
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "gemma-4-31b-it",
+      "backend": "google",
+      "seconds": 245.4,
+      "decision": "upgrade",
+      "verdict": "verified",
+      "reasons": [
+        "no regressions; every baseline problem attributed to this dependency is resolved"
+      ]
+    }
+  ]
+}

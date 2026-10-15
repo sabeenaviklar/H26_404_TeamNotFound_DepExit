@@ -1,0 +1,194 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "click",
+    "key": "click",
+    "relation": "direct",
+    "installed_version": "8.5.0",
+    "declared": [
+      {
+        "file": "requirements.txt",
+        "line": 6,
+        "spec": ">=7",
+        "group": "runtime",
+        "raw": "click>=7"
+      },
+      {
+        "file": "pyproject.toml",
+        "line": 18,
+        "spec": ">=7",
+        "group": "runtime",
+        "raw": "click>=7"
+      }
+    ],
+    "import_names": [
+      "click"
+    ],
+    "console_scripts": []
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "none",
+    "score": 0,
+    "at_risk": false,
+    "indicators": []
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "linkwatch/cli.py",
+        "line": 1,
+        "kind": "import",
+        "module": "click",
+        "symbol": "click",
+        "code": "import click"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 27,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.group",
+        "code": "@click.group()"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 28,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.version_option",
+        "code": "@click.version_option(__version__, prog_name=\"linkwatch\")"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 34,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.option",
+        "code": "@click.option(\"--config\", \"config_path\", default=\"sites.toml\", show_default=True,"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 60,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.ClickException",
+        "code": "raise click.ClickException(\"No cached results, run 'linkwatch check' first.\")"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 62,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.echo",
+        "code": "click.echo(\"Wrote %s\" % path)"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 51,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.option",
+        "code": "@click.option(\"--output\", \"-o\", default=\"status.html\", show_default=True,"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 53,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.option",
+        "code": "@click.option(\"--title\", default=\"linkwatch\", show_default=True)"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 68,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.echo",
+        "code": "click.echo(\"Templates: %s\" % resources.template_dir())"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 69,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.echo",
+        "code": "click.echo(\"Cache:     %s\" % cache.cache_file())"
+      },
+      {
+        "file": "tests/test_report.py",
+        "line": 1,
+        "kind": "from-import",
+        "module": "click",
+        "symbol": "click.testing.CliRunner",
+        "code": "from click.testing import CliRunner"
+      },
+      {
+        "file": "tests/test_report.py",
+        "line": 20,
+        "kind": "reference",
+        "module": "click",
+        "symbol": "click.testing.CliRunner",
+        "code": "result = CliRunner().invoke(cli, [\"report\", \"-o\", str(output)], catch_exceptions=False)"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "click",
+    "available": true,
+    "summary": "Composable command line interface toolkit",
+    "license": "BSD-3-Clause",
+    "latest_version": "8.5.0",
+    "latest_release_date": "2026-08-26",
+    "days_since_latest_release": 49,
+    "installed_version": "8.5.0",
+    "installed_release_date": "2026-08-26",
+    "installed_age_days": 49,
+    "installed_yanked": false,
+    "newer_releases_count": 0,
+    "major_versions_behind": 0,
+    "requires_python_latest": ">=3.10",
+    "inactive_classifier": false,
+    "python_classifiers": [],
+    "github": "pallets/click",
+    "source_url": "https://pypi.org/project/click/",
+    "repo_lookup": "HTTP 403"
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "click",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": []
+  },
+  "status": "not-required",
+  "open_concerns": [
+    {
+      "provenance": "observed",
+      "text": "Not selected for migration (below risk threshold or excluded by --only)."
+    }
+  ]
+}

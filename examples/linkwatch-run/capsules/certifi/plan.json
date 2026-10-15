@@ -1,0 +1,42 @@
+{
+  "decision": "remove",
+  "replacement": {
+    "package": null,
+    "version_spec": null,
+    "stdlib_module": null
+  },
+  "rationale": "The 'certifi' package is used only to provide the CA bundle path to 'requests' via 'certifi.where()'. However, 'requests' uses 'certifi' by default when 'verify=True' (which is the default behavior). Removing the explicit call and import removes the undeclared dependency risk without changing functionality, as 'requests' already depends on 'certifi' and handles the bundle path internally.",
+  "migration_steps": [
+    "Remove the explicit import of 'certifi' in 'linkwatch/checker.py'.",
+    "Remove the 'verify=certifi.where()' argument from the 'session.get' call in 'linkwatch/checker.py', allowing 'requests' to use its default CA bundle."
+  ],
+  "requirement_changes": [],
+  "code_edits": [
+    {
+      "file": "linkwatch/checker.py",
+      "find": "import certifi\nimport requests",
+      "replace": "import requests",
+      "why": "Remove unused certifi import"
+    },
+    {
+      "file": "linkwatch/checker.py",
+      "find": "        return session.get(url, verify=certifi.where())",
+      "replace": "        return session.get(url)",
+      "why": "Use requests default CA bundle instead of explicitly calling certifi.where()"
+    }
+  ],
+  "suggested_tests": [
+    {
+      "name": "test_fetch_no_certifi_import",
+      "purpose": "Ensure that fetch still works and doesn't raise ImportError after removing certifi import",
+      "code": "from linkwatch.checker import fetch\nimport pytest\n\ndef test_fetch_no_certifi_import(server):\n    # The server fixture provides an http URL, so SSL verification is not performed,\n    # but this confirms the code executes without ImportError.\n    resp = fetch(server + \"/ok\")\n    assert resp.status_code == 200"
+    }
+  ],
+  "compatibility_notes": [
+    "The code now relies on 'requests' default CA bundle management, which is the standard way to use 'certifi' with 'requests'."
+  ],
+  "risks": [
+    "If the environment had a non-standard 'certifi' configuration that 'requests' doesn't pick up automatically, this could theoretically change behavior, but 'certifi.where()' is exactly what 'requests' uses internally."
+  ],
+  "confidence": 1.0
+}

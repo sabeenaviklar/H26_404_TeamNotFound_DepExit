@@ -1,0 +1,9 @@
+```json
+{
+  "decision": "upgrade",
+  "replacement": {
+    "package": "requests",
+    "version_spec": "==2.34.2",
+    "stdlib_module": null
+  },
+  "

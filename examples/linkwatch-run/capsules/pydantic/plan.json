@@ -1,0 +1,66 @@
+{
+  "decision": "upgrade",
+  "replacement": {
+    "package": "pydantic",
+    "version_spec": ">=2.0",
+    "stdlib_module": null
+  },
+  "rationale": "The repository has a SPEC_CONFLICT between requirements.txt (==1.10.13) and pyproject.toml (>=2). The installed version is 1.10.13, but the code is triggering V2 deprecation warnings during installation/execution. Upgrading to Pydantic V2 aligns the manifests and removes the risk of using an outdated major version.",
+  "migration_steps": [
+    "Update pydantic version in requirements.txt to match pyproject.toml (>=2.0).",
+    "Update linkwatch/config.py to use Pydantic V2 syntax: replace 'validator' with 'field_validator', 'class Config' with 'model_config = ConfigDict(...)', and add '@classmethod' to validators."
+  ],
+  "requirement_changes": [
+    {
+      "action": "set",
+      "package": "pydantic",
+      "requirement": "pydantic>=2.0"
+    }
+  ],
+  "code_edits": [
+    {
+      "file": "linkwatch/config.py",
+      "find": "from pydantic import BaseModel, validator",
+      "replace": "from pydantic import BaseModel, field_validator, ConfigDict",
+      "why": "Import V2 replacements for validator and Config"
+    },
+    {
+      "file": "linkwatch/config.py",
+      "find": "    class Config:\n        anystr_strip_whitespace = True",
+      "replace": "    model_config = ConfigDict(str_strip_whitespace=True)",
+      "why": "Migrate V1 Config to V2 ConfigDict"
+    },
+    {
+      "file": "linkwatch/config.py",
+      "find": "    @validator(\"name\")\n    def name_not_empty(cls, value):",
+      "replace": "    @field_validator(\"name\")\n    @classmethod\n    def name_not_empty(cls, value):",
+      "why": "Migrate V1 validator to V2 field_validator"
+    },
+    {
+      "file": "linkwatch/config.py",
+      "find": "    @validator(\"url\")\n    def url_has_scheme(cls, value):",
+      "replace": "    @field_validator(\"url\")\n    @classmethod\n    def url_has_scheme(cls, value):",
+      "why": "Migrate V1 validator to V2 field_validator"
+    },
+    {
+      "file": "linkwatch/config.py",
+      "find": "    class Config:\n        extra = \"forbid\"",
+      "replace": "    model_config = ConfigDict(extra=\"forbid\")",
+      "why": "Migrate V1 Config to V2 ConfigDict"
+    }
+  ],
+  "suggested_tests": [
+    {
+      "name": "test_pydantic_v2_migration",
+      "purpose": "Verify that Site and Settings validation still works as expected with Pydantic V2",
+      "code": "import pytest\nfrom pydantic import ValidationError\nfrom linkwatch.config import Site, Settings\n\ndef test_site_validation():\n    # Test empty name\n    with pytest.raises(ValidationError, match=\"site name can not be empty\"):\n        Site(name=\"\", url=\"http://example.com\")\n    \n    # Test invalid url\n    with pytest.raises(ValidationError, match=\"url must start with http:// or https://\"):\n        Site(name=\"Example\", url=\"example.com\")\n    \n    # Test valid site and whitespace stripping\n    site = Site(name=\" Example \", url=\"https://example.com\")\n    assert site.name == \"Example\"\n\ndef test_settings_validation():\n    # Test extra forbid\n    with pytest.raises(ValidationError):\n        Settings(title=\"test\", extra_field=\"not allowed\")\n    \n    # Test valid settings\n    settings = Settings(title=\"test\", sites=[Site(name=\"S\", url=\"http://s.com\")])\n    assert settings.title == \"test\""
+    }
+  ],
+  "compatibility_notes": [
+    "Pydantic V2 introduces breaking changes in configuration and validation decorators. The migration uses ConfigDict and field_validator."
+  ],
+  "risks": [
+    "If other parts of the code (not found in AST scan) use Pydantic V1 features, they might break."
+  ],
+  "confidence": 1.0
+}

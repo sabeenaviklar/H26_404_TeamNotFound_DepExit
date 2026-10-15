@@ -1,0 +1,286 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "certifi",
+    "key": "certifi",
+    "relation": "undeclared",
+    "installed_version": "2026.7.22",
+    "declared": [],
+    "import_names": [
+      "certifi"
+    ],
+    "console_scripts": []
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "high",
+    "score": 20,
+    "at_risk": true,
+    "indicators": [
+      {
+        "id": "UNDECLARED",
+        "severity": "high",
+        "title": "Imported by the code but not declared in any manifest",
+        "evidence": "imported at linkwatch/checker.py:15, linkwatch/checker.py:4; only installed transitively",
+        "provenance": "observed:static"
+      }
+    ]
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "linkwatch/checker.py",
+        "line": 4,
+        "kind": "import",
+        "module": "certifi",
+        "symbol": "certifi",
+        "code": "import certifi"
+      },
+      {
+        "file": "linkwatch/checker.py",
+        "line": 15,
+        "kind": "reference",
+        "module": "certifi",
+        "symbol": "certifi.where",
+        "code": "return session.get(url, verify=certifi.where())"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "certifi",
+    "available": true,
+    "summary": "Python package for providing Mozilla's CA Bundle.",
+    "license": "MPL-2.0",
+    "latest_version": "2026.7.22",
+    "latest_release_date": "2026-07-22",
+    "days_since_latest_release": 85,
+    "installed_version": "2026.7.22",
+    "installed_release_date": "2026-07-22",
+    "installed_age_days": 85,
+    "installed_yanked": false,
+    "newer_releases_count": 0,
+    "major_versions_behind": 0,
+    "requires_python_latest": ">=3.7",
+    "inactive_classifier": false,
+    "python_classifiers": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13",
+      "3.14",
+      "3.7",
+      "3.8",
+      "3.9"
+    ],
+    "github": "certifi/python-certifi",
+    "source_url": "https://pypi.org/project/certifi/",
+    "repo_lookup": "HTTP 403"
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "certifi",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": []
+  },
+  "status": "verified",
+  "proposed_replacement": {
+    "provenance": "verified",
+    "decision": "remove",
+    "package": null,
+    "version_spec": null,
+    "stdlib_module": null,
+    "rationale": "The 'certifi' package is used only to provide the CA bundle path to 'requests' via 'certifi.where()'. However, 'requests' uses 'certifi' by default when 'verify=True' (which is the default behavior). Removing the explicit call and import removes the undeclared dependency risk without changing functionality, as 'requests' already depends on 'certifi' and handles the bundle path internally.",
+    "model_confidence": 1.0,
+    "plan_checks": []
+  },
+  "migration_steps": {
+    "provenance": "verified",
+    "steps": [
+      "Remove the explicit import of 'certifi' in 'linkwatch/checker.py'.",
+      "Remove the 'verify=certifi.where()' argument from the 'session.get' call in 'linkwatch/checker.py', allowing 'requests' to use its default CA bundle."
+    ],
+    "code_edits": [
+      {
+        "file": "linkwatch/checker.py",
+        "why": "Remove unused certifi import",
+        "applied": true,
+        "reason": "exact match"
+      },
+      {
+        "file": "linkwatch/checker.py",
+        "why": "Use requests default CA bundle instead of explicitly calling certifi.where()",
+        "applied": true,
+        "reason": "exact match"
+      }
+    ],
+    "requirement_changes": [],
+    "patch_file": "patch.diff"
+  },
+  "suggested_tests": {
+    "provenance": "ai",
+    "tests": [
+      {
+        "name": "test_fetch_no_certifi_import",
+        "purpose": "Ensure that fetch still works and doesn't raise ImportError after removing certifi import"
+      }
+    ],
+    "file": "tests/test_depexit_certifi.py",
+    "executed": true
+  },
+  "executed_test_results": {
+    "provenance": "measured",
+    "install": {
+      "ok": true,
+      "seconds": 0.15,
+      "output": " + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
+      "pip_check_ok": true,
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/certifi/attempt-1/venv\nChecked 26 packages in 0.85ms\nAll installed packages are compatible"
+    },
+    "candidate_versions": {
+      "idna": "2.7",
+      "click": "8.5.0",
+      "packaging": "26.3",
+      "toml": "0.10.2",
+      "Pygments": "2.21.0",
+      "rich": "15.0.0",
+      "Jinja2": "2.11.3",
+      "iniconfig": "2.3.1",
+      "appdirs": "1.4.4",
+      "nose": "1.3.7",
+      "pip": "26.2.1",
+      "pytest": "9.1.1",
+      "requests": "2.31.0",
+      "urllib3": "2.8.0",
+      "mdurl": "0.1.2",
+      "python-dateutil": "2.9.0.post0",
+      "chardet": "5.2.0",
+      "certifi": "2026.7.22",
+      "markdown-it-py": "4.2.0",
+      "pluggy": "1.6.0",
+      "setuptools": "75.8.0",
+      "typing_extensions": "4.16.0",
+      "MarkupSafe": "3.0.4",
+      "pydantic": "1.10.13",
+      "charset-normalizer": "3.5.2",
+      "six": "1.17.0"
+    },
+    "import_probes": [
+      {
+        "module": "certifi",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "residual_usages_of_old_package": [],
+    "repository_tests": {
+      "baseline": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "fixed": [],
+      "regressions": {},
+      "still_failing": {
+        "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+      },
+      "missing": []
+    },
+    "ai_written_tests": {
+      "against_original_dependency": {
+        "passed": 1,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "against_replacement": {
+        "passed": 1,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "per_test": [
+        {
+          "test": "test_fetch_no_certifi_import",
+          "original": "passed",
+          "replacement": "passed"
+        }
+      ]
+    },
+    "warnings_attributed_before": 0,
+    "warnings_attributed_after": 0,
+    "verdict": "verified",
+    "verdict_reasons": [
+      "no regressions; every baseline problem attributed to this dependency is resolved"
+    ]
+  },
+  "compatibility_gaps": [
+    {
+      "provenance": "measured",
+      "text": "Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+    },
+    {
+      "provenance": "ai",
+      "text": "The code now relies on 'requests' default CA bundle management, which is the standard way to use 'certifi' with 'requests'."
+    }
+  ],
+  "open_concerns": [
+    {
+      "provenance": "ai",
+      "text": "If the environment had a non-standard 'certifi' configuration that 'requests' doesn't pick up automatically, this could theoretically change behavior, but 'certifi.where()' is exactly what 'requests' uses internally."
+    },
+    {
+      "provenance": "observed",
+      "text": "Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe."
+    },
+    {
+      "provenance": "observed",
+      "text": "Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested."
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "gemma-4-31b-it",
+      "backend": "google",
+      "seconds": 169.2,
+      "decision": "remove",
+      "verdict": "verified",
+      "reasons": [
+        "no regressions; every baseline problem attributed to this dependency is resolved"
+      ]
+    }
+  ]
+}

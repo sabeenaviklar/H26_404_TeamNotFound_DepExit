@@ -1,0 +1,26 @@
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ IMAGE ?= linkwatch
+ PYTHON ?= python3.12
+ 
+-.PHONY: setup test test-nose docker-build docker-test
++.PHONY: setup test docker-build docker-test
+ 
+ setup:
+ 	$(PYTHON) -m venv .venv
+@@ -10,8 +10,7 @@
+ test:
+ 	python -m pytest
+ 
+-test-nose:
+-	nosetests tests/
++
+ 
+ docker-build:
+ 	docker build -t $(IMAGE) .
+--- a/requirements-dev.txt
++++ b/requirements-dev.txt
+@@ -1,2 +1 @@
+ pytest
+-nose==1.3.7

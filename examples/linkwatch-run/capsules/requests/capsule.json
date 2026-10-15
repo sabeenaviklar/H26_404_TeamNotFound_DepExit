@@ -1,0 +1,348 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "requests",
+    "key": "requests",
+    "relation": "direct",
+    "installed_version": "2.31.0",
+    "declared": [
+      {
+        "file": "requirements.txt",
+        "line": 3,
+        "spec": "==2.31.0",
+        "group": "runtime",
+        "raw": "requests==2.31.0"
+      },
+      {
+        "file": "pyproject.toml",
+        "line": 15,
+        "spec": "==2.31.0",
+        "group": "runtime",
+        "raw": "requests==2.31.0"
+      }
+    ],
+    "import_names": [
+      "requests"
+    ],
+    "console_scripts": []
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "medium",
+    "score": 23,
+    "at_risk": true,
+    "indicators": [
+      {
+        "id": "PRIVATE_API",
+        "severity": "medium",
+        "title": "Relies on a private (underscore) API that can change without notice",
+        "evidence": "linkwatch/encoding.py:5 requests.utils._parse_content_type_header",
+        "provenance": "observed:static"
+      },
+      {
+        "id": "MONKEYPATCH",
+        "severity": "medium",
+        "title": "Monkeypatches the library at import time",
+        "evidence": "linkwatch/http_patch.py:14 requests.Session.request",
+        "provenance": "observed:static"
+      },
+      {
+        "id": "OLD_PIN",
+        "severity": "low",
+        "title": "Pinned to a release older than 3 years",
+        "evidence": "2.31.0 released 2023-05-22, latest 2.34.2",
+        "provenance": "observed:registry"
+      }
+    ]
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "linkwatch/checker.py",
+        "line": 5,
+        "kind": "import",
+        "module": "requests",
+        "symbol": "requests",
+        "code": "import requests"
+      },
+      {
+        "file": "linkwatch/checker.py",
+        "line": 6,
+        "kind": "from-import",
+        "module": "requests",
+        "symbol": "requests.Session",
+        "code": "from requests import Session as S"
+      },
+      {
+        "file": "linkwatch/checker.py",
+        "line": 13,
+        "kind": "reference",
+        "module": "requests",
+        "symbol": "requests.Session",
+        "code": "session = S()"
+      },
+      {
+        "file": "linkwatch/checker.py",
+        "line": 35,
+        "kind": "reference",
+        "module": "requests",
+        "symbol": "requests.exceptions.ConnectionError",
+        "code": "except requests.exceptions.ConnectionError:"
+      },
+      {
+        "file": "linkwatch/checker.py",
+        "line": 38,
+        "kind": "reference",
+        "module": "requests",
+        "symbol": "requests.exceptions.Timeout",
+        "code": "except requests.exceptions.Timeout:"
+      },
+      {
+        "file": "linkwatch/encoding.py",
+        "line": 5,
+        "kind": "private-api",
+        "module": "requests",
+        "symbol": "requests.utils._parse_content_type_header",
+        "code": "from requests.utils import _parse_content_type_header"
+      },
+      {
+        "file": "linkwatch/encoding.py",
+        "line": 5,
+        "kind": "from-import",
+        "module": "requests",
+        "symbol": "requests.utils._parse_content_type_header",
+        "code": "from requests.utils import _parse_content_type_header"
+      },
+      {
+        "file": "linkwatch/encoding.py",
+        "line": 11,
+        "kind": "reference",
+        "module": "requests",
+        "symbol": "requests.utils._parse_content_type_header",
+        "code": "_, params = _parse_content_type_header(resp.headers.get(\"Content-Type\", \"\"))"
+      },
+      {
+        "file": "linkwatch/http_patch.py",
+        "line": 1,
+        "kind": "import",
+        "module": "requests",
+        "symbol": "requests",
+        "code": "import requests"
+      },
+      {
+        "file": "linkwatch/http_patch.py",
+        "line": 5,
+        "kind": "reference",
+        "module": "requests",
+        "symbol": "requests.Session.request",
+        "code": "_original_request = requests.Session.request"
+      },
+      {
+        "file": "linkwatch/http_patch.py",
+        "line": 14,
+        "kind": "monkeypatch",
+        "module": "requests",
+        "symbol": "requests.Session.request",
+        "code": "requests.Session.request = _request"
+      },
+      {
+        "file": "linkwatch/http_patch.py",
+        "line": 14,
+        "kind": "reference",
+        "module": "requests",
+        "symbol": "requests.Session.request",
+        "code": "requests.Session.request = _request"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "requests",
+    "available": true,
+    "summary": "Python HTTP for Humans.",
+    "license": "Apache-2.0",
+    "latest_version": "2.34.2",
+    "latest_release_date": "2026-05-14",
+    "days_since_latest_release": 153,
+    "installed_version": "2.31.0",
+    "installed_release_date": "2023-05-22",
+    "installed_age_days": 1241,
+    "installed_yanked": false,
+    "newer_releases_count": 9,
+    "major_versions_behind": 0,
+    "requires_python_latest": ">=3.10",
+    "inactive_classifier": false,
+    "python_classifiers": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13",
+      "3.14",
+      "3.15"
+    ],
+    "github": "psf/requests",
+    "source_url": "https://pypi.org/project/requests/",
+    "repo_lookup": "HTTP 403"
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "requests",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": []
+  },
+  "status": "verified",
+  "proposed_replacement": {
+    "provenance": "verified",
+    "decision": null,
+    "package": null,
+    "version_spec": null,
+    "stdlib_module": null,
+    "rationale": null,
+    "model_confidence": null,
+    "plan_checks": []
+  },
+  "migration_steps": {
+    "provenance": "verified",
+    "steps": [],
+    "code_edits": [],
+    "requirement_changes": [],
+    "patch_file": "patch.diff"
+  },
+  "suggested_tests": {
+    "provenance": "ai",
+    "tests": [],
+    "file": null,
+    "executed": false
+  },
+  "executed_test_results": {
+    "provenance": "measured",
+    "install": {
+      "ok": true,
+      "seconds": 0.15,
+      "output": " + appdirs==1.4.4\n + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
+      "pip_check_ok": true,
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/requests/attempt-1/venv\nChecked 26 packages in 0.80ms\nAll installed packages are compatible"
+    },
+    "candidate_versions": {
+      "idna": "2.7",
+      "click": "8.5.0",
+      "packaging": "26.3",
+      "toml": "0.10.2",
+      "Pygments": "2.21.0",
+      "rich": "15.0.0",
+      "Jinja2": "2.11.3",
+      "iniconfig": "2.3.1",
+      "appdirs": "1.4.4",
+      "nose": "1.3.7",
+      "pip": "26.2.1",
+      "pytest": "9.1.1",
+      "requests": "2.31.0",
+      "urllib3": "2.8.0",
+      "mdurl": "0.1.2",
+      "python-dateutil": "2.9.0.post0",
+      "chardet": "5.2.0",
+      "certifi": "2026.7.22",
+      "markdown-it-py": "4.2.0",
+      "pluggy": "1.6.0",
+      "setuptools": "75.8.0",
+      "typing_extensions": "4.16.0",
+      "MarkupSafe": "3.0.4",
+      "pydantic": "1.10.13",
+      "charset-normalizer": "3.5.2",
+      "six": "1.17.0"
+    },
+    "import_probes": [
+      {
+        "module": "requests",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "residual_usages_of_old_package": [],
+    "repository_tests": {
+      "baseline": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "fixed": [],
+      "regressions": {},
+      "still_failing": {
+        "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+      },
+      "missing": []
+    },
+    "ai_written_tests": null,
+    "warnings_attributed_before": 0,
+    "warnings_attributed_after": 0,
+    "verdict": "verified",
+    "verdict_reasons": [
+      "no regressions; every baseline problem attributed to this dependency is resolved"
+    ]
+  },
+  "compatibility_gaps": [
+    {
+      "provenance": "measured",
+      "text": "Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+    }
+  ],
+  "open_concerns": [
+    {
+      "provenance": "observed",
+      "text": "No AI-written tests were produced for this dependency."
+    },
+    {
+      "provenance": "observed",
+      "text": "Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe."
+    },
+    {
+      "provenance": "observed",
+      "text": "Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested."
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "gemma-4-31b-it",
+      "backend": "google",
+      "seconds": 278.4,
+      "decision": null,
+      "verdict": "verified",
+      "reasons": [
+        "no regressions; every baseline problem attributed to this dependency is resolved"
+      ]
+    }
+  ]
+}

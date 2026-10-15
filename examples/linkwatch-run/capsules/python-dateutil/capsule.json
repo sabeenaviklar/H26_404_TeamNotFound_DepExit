@@ -1,0 +1,140 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "python-dateutil",
+    "key": "python-dateutil",
+    "relation": "direct",
+    "installed_version": "2.9.0.post0",
+    "declared": [
+      {
+        "file": "requirements.txt",
+        "line": 11,
+        "spec": "*",
+        "group": "runtime",
+        "raw": "python-dateutil"
+      },
+      {
+        "file": "pyproject.toml",
+        "line": 23,
+        "spec": "*",
+        "group": "runtime",
+        "raw": "python-dateutil"
+      }
+    ],
+    "import_names": [
+      "dateutil"
+    ],
+    "console_scripts": []
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "medium",
+    "score": 13,
+    "at_risk": false,
+    "indicators": [
+      {
+        "id": "UNPINNED",
+        "severity": "low",
+        "title": "No version constraint, so installs are not reproducible",
+        "evidence": "requirements.txt:11; pyproject.toml:23",
+        "provenance": "observed:static"
+      },
+      {
+        "id": "STALE_UPSTREAM",
+        "severity": "medium",
+        "title": "No release in 2 year(s)",
+        "evidence": "latest 2.9.0.post0 released 2024-03-01",
+        "provenance": "observed:registry"
+      }
+    ]
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "linkwatch/dates.py",
+        "line": 1,
+        "kind": "from-import",
+        "module": "dateutil",
+        "symbol": "dateutil.parser",
+        "code": "from dateutil import parser"
+      },
+      {
+        "file": "linkwatch/dates.py",
+        "line": 8,
+        "kind": "reference",
+        "module": "dateutil",
+        "symbol": "dateutil.parser.parse",
+        "code": "return parser.parse(value)"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "python-dateutil",
+    "available": true,
+    "summary": "Extensions to the standard Python datetime module",
+    "license": "Dual License",
+    "latest_version": "2.9.0.post0",
+    "latest_release_date": "2024-03-01",
+    "days_since_latest_release": 957,
+    "installed_version": "2.9.0.post0",
+    "installed_release_date": "2024-03-01",
+    "installed_age_days": 957,
+    "installed_yanked": false,
+    "newer_releases_count": 0,
+    "major_versions_behind": 0,
+    "requires_python_latest": "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7",
+    "inactive_classifier": false,
+    "python_classifiers": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.3",
+      "3.4",
+      "3.5",
+      "3.6",
+      "3.7",
+      "3.8",
+      "3.9"
+    ],
+    "github": "dateutil/dateutil",
+    "source_url": "https://pypi.org/project/python-dateutil/",
+    "repo_lookup": "HTTP 403"
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "dateutil",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": []
+  },
+  "status": "not-required",
+  "open_concerns": [
+    {
+      "provenance": "observed",
+      "text": "Not selected for migration (below risk threshold or excluded by --only)."
+    }
+  ]
+}

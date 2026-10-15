@@ -1,0 +1,191 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "pytest",
+    "key": "pytest",
+    "relation": "direct",
+    "installed_version": "9.1.1",
+    "declared": [
+      {
+        "file": "requirements-dev.txt",
+        "line": 1,
+        "spec": "*",
+        "group": "dev",
+        "raw": "pytest"
+      }
+    ],
+    "import_names": [
+      "py",
+      "pytest"
+    ],
+    "console_scripts": [
+      "py.test",
+      "pytest"
+    ]
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "low",
+    "score": 3,
+    "at_risk": false,
+    "indicators": [
+      {
+        "id": "UNPINNED",
+        "severity": "low",
+        "title": "No version constraint, so installs are not reproducible",
+        "evidence": "requirements-dev.txt:1",
+        "provenance": "observed:static"
+      }
+    ]
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "tests/conftest.py",
+        "line": 6,
+        "kind": "import",
+        "module": "pytest",
+        "symbol": "pytest",
+        "code": "import pytest"
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 60,
+        "kind": "reference",
+        "module": "pytest",
+        "symbol": "pytest.fixture",
+        "code": "@pytest.fixture(scope=\"session\")"
+      },
+      {
+        "file": "tests/conftest.py",
+        "line": 70,
+        "kind": "reference",
+        "module": "pytest",
+        "symbol": "pytest.fixture",
+        "code": "@pytest.fixture"
+      },
+      {
+        "file": "Makefile",
+        "line": 11,
+        "kind": "text",
+        "module": "py",
+        "symbol": "pytest",
+        "code": "python -m pytest"
+      },
+      {
+        "file": "Makefile",
+        "line": 11,
+        "kind": "text",
+        "module": "pytest",
+        "symbol": "pytest",
+        "code": "python -m pytest"
+      },
+      {
+        "file": "Makefile",
+        "line": 20,
+        "kind": "text",
+        "module": "py",
+        "symbol": "pytest",
+        "code": "docker run --rm $(IMAGE) pytest"
+      },
+      {
+        "file": "Makefile",
+        "line": 20,
+        "kind": "text",
+        "module": "pytest",
+        "symbol": "pytest",
+        "code": "docker run --rm $(IMAGE) pytest"
+      },
+      {
+        "file": "Dockerfile",
+        "line": 12,
+        "kind": "text",
+        "module": "py",
+        "symbol": "pytest",
+        "code": "CMD [\"pytest\"]"
+      },
+      {
+        "file": "Dockerfile",
+        "line": 12,
+        "kind": "text",
+        "module": "pytest",
+        "symbol": "pytest",
+        "code": "CMD [\"pytest\"]"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "pytest",
+    "available": true,
+    "summary": "pytest: simple powerful testing with Python",
+    "license": "MIT",
+    "latest_version": "9.1.1",
+    "latest_release_date": "2026-06-19",
+    "days_since_latest_release": 117,
+    "installed_version": "9.1.1",
+    "installed_release_date": "2026-06-19",
+    "installed_age_days": 117,
+    "installed_yanked": false,
+    "newer_releases_count": 0,
+    "major_versions_behind": 0,
+    "requires_python_latest": ">=3.10",
+    "inactive_classifier": false,
+    "python_classifiers": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13",
+      "3.14",
+      "3.15"
+    ],
+    "github": "pytest-dev/pytest",
+    "source_url": "https://pypi.org/project/pytest/",
+    "repo_archived": false,
+    "repo_last_push": "2026-10-13",
+    "repo_days_since_push": 2
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "py",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      },
+      {
+        "module": "pytest",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": []
+  },
+  "status": "not-required",
+  "open_concerns": [
+    {
+      "provenance": "observed",
+      "text": "Not selected for migration (below risk threshold or excluded by --only)."
+    }
+  ]
+}

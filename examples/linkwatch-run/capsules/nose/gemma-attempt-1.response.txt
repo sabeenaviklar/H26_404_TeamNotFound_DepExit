@@ -1,0 +1,43 @@
+```json
+{
+  "decision": "remove",
+  "replacement": {
+    "package": null,
+    "version_spec": null,
+    "stdlib_module": null
+  },
+  "rationale": "The 'nose' package is incompatible with Python 3.12 because it relies on the 'imp' module, which was removed in this Python version (IMPORT_FAILS). Additionally, 'nose' is STALE_UPSTREAM with no releases since 2015. The repository already uses 'pytest' as its primary test runner (as seen in the 'test' target of the Makefile and 'requirements-dev.txt'), making 'nose' redundant.",
+  "migration_steps": [
+    "Remove 'nose' from 'requirements-dev.txt'.",
+    "Remove the 'test-nose' target and its reference in '.PHONY' from the 'Makefile'."
+  ],
+  "requirement_changes": [
+    {
+      "action": "remove",
+      "package": "nose"
+    }
+  ],
+  "code_edits": [
+    {
+      "file": "Makefile",
+      "find": ".PHONY: setup test test-nose docker-build docker-test",
+      "replace": ".PHONY: setup test docker-build docker-test",
+      "why": "Remove test-nose from the list of phony targets."
+    },
+    {
+      "file": "Makefile",
+      "find": "test-nose:\n\tnosetests tests/",
+      "replace": "",
+      "why": "Remove the redundant and broken nose test target."
+    }
+  ],
+  "suggested_tests": [],
+  "compatibility_notes": [
+    "The 'test-nose' Makefile target is removed. Users should use 'make test' which runs pytest."
+  ],
+  "risks": [
+    "If there were specific nose-only plugins or configurations used in the tests that pytest does not support, some tests might behave differently, although the baseline run indicates pytest is already functional."
+  ],
+  "confidence": 1.0
+}
+```

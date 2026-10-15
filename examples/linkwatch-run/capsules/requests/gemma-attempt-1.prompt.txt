@@ -1,0 +1,332 @@
+Propose a migration plan for ONE dependency of this repository.
+
+## Target
+Python 3.12.14 (repository supports: >=3.10)
+
+## Dependency under review
+{
+  "name": "requests",
+  "relation": "direct",
+  "installed_version": "2.31.0",
+  "declared": [
+    {
+      "file": "requirements.txt",
+      "line": 3,
+      "spec": "==2.31.0",
+      "group": "runtime"
+    },
+    {
+      "file": "pyproject.toml",
+      "line": 15,
+      "spec": "==2.31.0",
+      "group": "runtime"
+    }
+  ],
+  "import_names": [
+    "requests"
+  ],
+  "console_scripts": [],
+  "latest_version_on_pypi": "2.34.2",
+  "latest_release_date": "2026-05-14",
+  "upstream_repo_archived": null,
+  "import_probe_results": [
+    {
+      "module": "requests",
+      "ok": true,
+      "error": "",
+      "warnings": []
+    }
+  ]
+}
+
+## Risk indicators (observed or measured by the tool, not by you)
+- PRIVATE_API (medium, observed:static): Relies on a private (underscore) API that can change without notice. Evidence: linkwatch/encoding.py:5 requests.utils._parse_content_type_header
+- MONKEYPATCH (medium, observed:static): Monkeypatches the library at import time. Evidence: linkwatch/http_patch.py:14 requests.Session.request
+- OLD_PIN (low, observed:registry): Pinned to a release older than 3 years. Evidence: 2.31.0 released 2023-05-22, latest 2.34.2
+
+## Where it is used (AST scan + build files)
+- linkwatch/checker.py:5 [import] requests :: import requests
+- linkwatch/checker.py:6 [from-import] requests.Session :: from requests import Session as S
+- linkwatch/checker.py:13 [reference] requests.Session :: session = S()
+- linkwatch/checker.py:35 [reference] requests.exceptions.ConnectionError :: except requests.exceptions.ConnectionError:
+- linkwatch/checker.py:38 [reference] requests.exceptions.Timeout :: except requests.exceptions.Timeout:
+- linkwatch/encoding.py:5 [private-api] requests.utils._parse_content_type_header :: from requests.utils import _parse_content_type_header
+- linkwatch/encoding.py:5 [from-import] requests.utils._parse_content_type_header :: from requests.utils import _parse_content_type_header
+- linkwatch/encoding.py:11 [reference] requests.utils._parse_content_type_header :: _, params = _parse_content_type_header(resp.headers.get("Content-Type", ""))
+- linkwatch/http_patch.py:1 [import] requests :: import requests
+- linkwatch/http_patch.py:5 [reference] requests.Session.request :: _original_request = requests.Session.request
+- linkwatch/http_patch.py:14 [monkeypatch] requests.Session.request :: requests.Session.request = _request
+- linkwatch/http_patch.py:14 [reference] requests.Session.request :: requests.Session.request = _request
+
+## Baseline test run on the target Python
+9 passed, 1 failed, 0 errors.
+- tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)
+
+## Files you may edit (full contents)
+### linkwatch/checker.py
+```
+import time
+from datetime import datetime, timezone
+
+import certifi
+import requests
+from requests import Session as S
+
+from .dates import parse_last_modified
+from .encoding import page_title
+
+
+def fetch(url):
+    session = S()
+    try:
+        return session.get(url, verify=certifi.where())
+    finally:
+        session.close()
+
+
+def check_site(site):
+    result = {
+        "name": site.name,
+        "url": site.url,
+        "up": False,
+        "status": None,
+        "reason": "",
+        "title": "",
+        "elapsed_ms": None,
+        "last_modified": None,
+        "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
+    started = time.monotonic()
+    try:
+        resp = fetch(site.url)
+    except requests.exceptions.ConnectionError:
+        result["reason"] = "connection error"
+        return result
+    except requests.exceptions.Timeout:
+        result["reason"] = "timed out"
+        return result
+    result["elapsed_ms"] = int((time.monotonic() - started) * 1000)
+    result["status"] = resp.status_code
+    result["up"] = resp.ok
+    result["reason"] = resp.reason or ""
+    result["title"] = page_title(resp)
+    modified = parse_last_modified(resp.headers.get("Last-Modified"))
+    if modified:
+        result["last_modified"] = modified.isoformat()
+    return result
+
+
+def check_all(sites):
+    for site in sites:
+        yield check_site(site)
+```
+
+### linkwatch/encoding.py
+```
+import html
+import re
+
+import chardet
+from requests.utils import _parse_content_type_header
+
+TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
+
+
+def detect_encoding(resp):
+    _, params = _parse_content_type_header(resp.headers.get("Content-Type", ""))
+    charset = params.get("charset")
+    if charset and charset is not True:
+        return charset
+    guess = chardet.detect(resp.content)
+    return guess["encoding"] or "utf-8"
+
+
+def page_title(resp):
+    if not resp.content:
+        return ""
+    text = resp.content.decode(detect_encoding(resp), errors="replace")
+    match = TITLE_RE.search(text)
+    if not match:
+        return ""
+    return html.unescape(" ".join(match.group(1).split()))
+```
+
+### linkwatch/http_patch.py
+```
+import requests
+
+USER_AGENT = "linkwatch/1.0"
+
+_original_request = requests.Session.request
+
+
+def _request(self, method, url, **kwargs):
+    headers = dict(kwargs.pop("headers", None) or {})
+    headers["User-Agent"] = USER_AGENT
+    return _original_request(self, method, url, headers=headers, **kwargs)
+
+
+requests.Session.request = _request
+```
+
+### pyproject.toml
+```
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkwatch"
+version = "0.3.1"
+description = "A small CLI link and uptime checker with an HTML status page"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "toml==0.10.2",
+    "appdirs==1.4.4",
+    "requests==2.31.0",
+    "Jinja2==2.11.3",
+    "pydantic>=2",
+    "click>=7",
+    "six",
+    "chardet==5.2.0",
+    "setuptools==75.8.0",
+    "idna==2.7",
+    "python-dateutil",
+    "rich",
+]
+
+[project.scripts]
+linkwatch = "linkwatch.cli:cli"
+
+[tool.setuptools]
+packages = ["linkwatch"]
+
+[tool.setuptools.package-data]
+linkwatch = ["templates/*.j2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+```
+
+### requirements-dev.txt
+```
+pytest
+nose==1.3.7
+```
+
+### requirements.txt
+```
+toml==0.10.2
+appdirs==1.4.4
+requests==2.31.0
+Jinja2==2.11.3
+pydantic==1.10.13
+click>=7
+six
+chardet==5.2.0
+setuptools==75.8.0
+idna==2.7
+python-dateutil
+rich
+# PyYAML==5.1
+```
+
+### tests/conftest.py
+```
+import socket
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+import pytest
+
+import linkwatch.cli  # noqa: F401
+
+OK_PAGE = (
+    "<!doctype html><html><head><meta charset='utf-8'>"
+    "<title>linkwatch test page</title></head>"
+    "<body><p>Everything is fine ✓</p></body></html>"
+)
+
+LATIN1_PAGE = (
+    "<html><head><title>Café Crème</title></head><body>"
+    "<h1>Bienvenue au café</h1>"
+    "<p>Nous servons du thé, des crêpes et des gâteaux préparés "
+    "à la française. Le café est ouvert de huit heures à dix-huit "
+    "heures, sauf le dimanche. N'hésitez pas à réserver une table pour "
+    "goûter notre crème brûlée et nos spécialités régionales.</p>"
+    "</body></html>"
+)
+
+
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
+    def send_body(self, status, body, content_type, headers=None):
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        for key, value in (headers or {}).items():
+            self.send_header(key, value)
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        if self.path == "/ok":
+            self.send_body(200, OK_PAGE.encode("utf-8"), "text/html; charset=utf-8",
+                           {"Last-Modified": "Wed, 21 Oct 2015 07:28:00 GMT"})
+        elif self.path == "/missing":
+            self.send_body(404, b"not found", "text/plain")
+        elif self.path == "/redirect":
+            self.send_body(302, b"", "text/plain", {"Location": "/ok"})
+        elif self.path == "/slow":
+            time.sleep(6)
+            self.send_body(200, OK_PAGE.encode("utf-8"), "text/html; charset=utf-8")
+        elif self.path == "/latin1":
+            self.send_body(200, LATIN1_PAGE.encode("cp1252"), "text/html")
+        elif self.path == "/echo-ua":
+            ua = self.headers.get("User-Agent", "")
+            self.send_body(200, ua.encode("utf-8"), "text/plain; charset=utf-8")
+        else:
+            self.send_body(404, b"not found", "text/plain")
+
+
+@pytest.fixture(scope="session")
+def server():
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    yield "http://127.0.0.1:%d" % httpd.server_address[1]
+    httpd.shutdown()
+    httpd.server_close()
+
+
+@pytest.fixture
+def closed_port():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("127.0.0.1", 0))
+    port = sock.getsockname()[1]
+    sock.close()
+    return port
+```
+
+## Reply with this JSON shape
+{
+  "decision": "replace | upgrade | remove | pin | keep",
+  "replacement": {"package": "<pypi name or null>", "version_spec": "<e.g. >=3.1 or empty>", "stdlib_module": "<module or null>"},
+  "rationale": "<why, citing the evidence ids such as IMPORT_FAILS or STALE_UPSTREAM>",
+  "migration_steps": ["<step>", "..."],
+  "requirement_changes": [
+    {"action": "remove", "package": "<name>"},
+    {"action": "set", "package": "<name>", "requirement": "<name><spec>"},
+    {"action": "add", "requirement": "<name><spec>"}
+  ],
+  "code_edits": [{"file": "<relative path>", "find": "<exact text>", "replace": "<new text>", "why": "<short>"}],
+  "suggested_tests": [{"name": "test_<name>", "purpose": "<what it protects>", "code": "<pytest source>"}],
+  "compatibility_notes": ["<behaviour differences to watch>"],
+  "risks": ["<what could still go wrong>"],
+  "confidence": 0.0
+}

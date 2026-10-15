@@ -1,0 +1,161 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "rich",
+    "key": "rich",
+    "relation": "direct",
+    "installed_version": "15.0.0",
+    "declared": [
+      {
+        "file": "requirements.txt",
+        "line": 12,
+        "spec": "*",
+        "group": "runtime",
+        "raw": "rich"
+      },
+      {
+        "file": "pyproject.toml",
+        "line": 24,
+        "spec": "*",
+        "group": "runtime",
+        "raw": "rich"
+      }
+    ],
+    "import_names": [
+      "rich"
+    ],
+    "console_scripts": []
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "low",
+    "score": 3,
+    "at_risk": false,
+    "indicators": [
+      {
+        "id": "UNPINNED",
+        "severity": "low",
+        "title": "No version constraint, so installs are not reproducible",
+        "evidence": "requirements.txt:12; pyproject.toml:24",
+        "provenance": "observed:static"
+      }
+    ]
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "linkwatch/cli.py",
+        "line": 2,
+        "kind": "from-import",
+        "module": "rich",
+        "symbol": "rich.console.Console",
+        "code": "from rich.console import Console"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 3,
+        "kind": "from-import",
+        "module": "rich",
+        "symbol": "rich.live.Live",
+        "code": "from rich.live import Live"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 4,
+        "kind": "from-import",
+        "module": "rich",
+        "symbol": "rich.table.Table",
+        "code": "from rich.table import Table"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 9,
+        "kind": "reference",
+        "module": "rich",
+        "symbol": "rich.console.Console",
+        "code": "console = Console()"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 13,
+        "kind": "reference",
+        "module": "rich",
+        "symbol": "rich.table.Table",
+        "code": "table = Table(title=title)"
+      },
+      {
+        "file": "linkwatch/cli.py",
+        "line": 40,
+        "kind": "reference",
+        "module": "rich",
+        "symbol": "rich.live.Live",
+        "code": "with Live(build_table(settings.title, results), console=console,"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "rich",
+    "available": true,
+    "summary": "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal",
+    "license": "MIT",
+    "latest_version": "15.0.0",
+    "latest_release_date": "2026-04-12",
+    "days_since_latest_release": 185,
+    "installed_version": "15.0.0",
+    "installed_release_date": "2026-04-12",
+    "installed_age_days": 185,
+    "installed_yanked": false,
+    "newer_releases_count": 0,
+    "major_versions_behind": 0,
+    "requires_python_latest": ">=3.9.0",
+    "inactive_classifier": false,
+    "python_classifiers": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13",
+      "3.14",
+      "3.9"
+    ],
+    "github": "Textualize/rich",
+    "source_url": "https://pypi.org/project/rich/",
+    "repo_lookup": "HTTP 403"
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "rich",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": []
+  },
+  "status": "not-required",
+  "open_concerns": [
+    {
+      "provenance": "observed",
+      "text": "Not selected for migration (below risk threshold or excluded by --only)."
+    }
+  ]
+}

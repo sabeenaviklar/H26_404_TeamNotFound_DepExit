@@ -1,0 +1,333 @@
+{
+  "capsule_version": "1.0",
+  "generated_at": "2026-10-15T07:01:03+00:00",
+  "generator": "depexit 0.1.0",
+  "target": {
+    "source": "https://github.com/rishrek/LinkWatch",
+    "commit": "f52f3930c8e7c33d934ccf614955a38e26984bd5",
+    "python": "3.12.14"
+  },
+  "provenance_legend": {
+    "observed": "read from repository files or package registries; no execution",
+    "measured": "produced by executing installs, imports or tests",
+    "ai": "proposed by the model; not trusted until verified",
+    "verified": "AI proposal applied by DepExit and confirmed by execution"
+  },
+  "dependency": {
+    "provenance": "observed",
+    "name": "appdirs",
+    "key": "appdirs",
+    "relation": "direct",
+    "installed_version": "1.4.4",
+    "declared": [
+      {
+        "file": "requirements.txt",
+        "line": 2,
+        "spec": "==1.4.4",
+        "group": "runtime",
+        "raw": "appdirs==1.4.4"
+      },
+      {
+        "file": "pyproject.toml",
+        "line": 14,
+        "spec": "==1.4.4",
+        "group": "runtime",
+        "raw": "appdirs==1.4.4"
+      }
+    ],
+    "import_names": [
+      "appdirs"
+    ],
+    "console_scripts": []
+  },
+  "risk": {
+    "provenance": "observed+measured",
+    "level": "high",
+    "score": 23,
+    "at_risk": true,
+    "indicators": [
+      {
+        "id": "STALE_UPSTREAM",
+        "severity": "high",
+        "title": "No release in 6 year(s)",
+        "evidence": "latest 1.4.4 released 2020-05-11",
+        "provenance": "observed:registry"
+      },
+      {
+        "id": "OLD_PIN",
+        "severity": "low",
+        "title": "Pinned to a release older than 3 years",
+        "evidence": "1.4.4 released 2020-05-11, latest 1.4.4",
+        "provenance": "observed:registry"
+      }
+    ]
+  },
+  "usage_locations": {
+    "provenance": "observed",
+    "items": [
+      {
+        "file": "linkwatch/cache.py",
+        "line": 4,
+        "kind": "from-import",
+        "module": "appdirs",
+        "symbol": "appdirs.user_cache_dir",
+        "code": "from appdirs import user_cache_dir"
+      },
+      {
+        "file": "linkwatch/cache.py",
+        "line": 10,
+        "kind": "reference",
+        "module": "appdirs",
+        "symbol": "appdirs.user_cache_dir",
+        "code": "path = os.environ.get(\"LINKWATCH_CACHE_DIR\") or user_cache_dir(\"linkwatch\")"
+      }
+    ]
+  },
+  "registry": {
+    "provenance": "observed",
+    "package": "appdirs",
+    "available": true,
+    "summary": "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\".",
+    "license": "MIT",
+    "latest_version": "1.4.4",
+    "latest_release_date": "2020-05-11",
+    "days_since_latest_release": 2347,
+    "installed_version": "1.4.4",
+    "installed_release_date": "2020-05-11",
+    "installed_age_days": 2347,
+    "installed_yanked": false,
+    "newer_releases_count": 0,
+    "major_versions_behind": 0,
+    "requires_python_latest": "",
+    "inactive_classifier": false,
+    "python_classifiers": [
+      "3.4",
+      "3.5",
+      "3.6",
+      "3.7",
+      "3.8"
+    ],
+    "github": "ActiveState/appdirs",
+    "source_url": "https://pypi.org/project/appdirs/",
+    "repo_lookup": "HTTP 403"
+  },
+  "baseline_execution": {
+    "provenance": "measured",
+    "import_probes": [
+      {
+        "module": "appdirs",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "failing_tests": [],
+    "warnings": []
+  },
+  "status": "verified",
+  "proposed_replacement": {
+    "provenance": "verified",
+    "decision": "replace",
+    "package": "platformdirs",
+    "version_spec": "",
+    "stdlib_module": null,
+    "rationale": "The appdirs package is stale (STALE_UPSTREAM), with no releases since 2020. platformdirs is the widely accepted, maintained drop-in replacement for appdirs and is fully compatible with Python 3.12.",
+    "model_confidence": 1.0,
+    "plan_checks": [
+      {
+        "check": "package 'platformdirs' exists on PyPI",
+        "passed": true,
+        "detail": "latest 4.13.0"
+      }
+    ]
+  },
+  "migration_steps": {
+    "provenance": "verified",
+    "steps": [
+      "Replace appdirs with platformdirs in the dependency manifests (pyproject.toml and requirements.txt).",
+      "Update the import statement in linkwatch/cache.py to use platformdirs instead of appdirs."
+    ],
+    "code_edits": [
+      {
+        "file": "linkwatch/cache.py",
+        "why": "Switch from stale appdirs to maintained platformdirs.",
+        "applied": true,
+        "reason": "exact match"
+      }
+    ],
+    "requirement_changes": [
+      {
+        "change": {
+          "action": "remove",
+          "package": "appdirs"
+        },
+        "files": [
+          "pyproject.toml",
+          "requirements.txt"
+        ],
+        "applied": true
+      },
+      {
+        "change": {
+          "action": "add",
+          "requirement": "platformdirs"
+        },
+        "files": [
+          "pyproject.toml",
+          "requirements.txt"
+        ],
+        "applied": true
+      }
+    ],
+    "patch_file": "patch.diff"
+  },
+  "suggested_tests": {
+    "provenance": "ai",
+    "tests": [
+      {
+        "name": "test_cache_dir_functionality",
+        "purpose": "Verify that cache_dir still returns a valid path and respects the LINKWATCH_CACHE_DIR environment variable."
+      }
+    ],
+    "file": "tests/test_depexit_appdirs.py",
+    "executed": true
+  },
+  "executed_test_results": {
+    "provenance": "measured",
+    "install": {
+      "ok": true,
+      "seconds": 1.13,
+      "output": " + certifi==2026.7.22\n + chardet==5.2.0\n + charset-normalizer==3.5.2\n + click==8.5.0\n + idna==2.7\n + iniconfig==2.3.1\n + jinja2==2.11.3\n + markdown-it-py==4.2.0\n + markupsafe==3.0.4\n + mdurl==0.1.2\n + nose==1.3.7\n + packaging==26.3\n + platformdirs==4.13.0\n + pluggy==1.6.0\n + pydantic==1.10.13\n + pygments==2.21.0\n + pytest==9.1.1\n + python-dateutil==2.9.0.post0\n + requests==2.31.0\n + rich==15.0.0\n + setuptools==75.8.0\n + six==1.17.0\n + toml==0.10.2\n + typing-extensions==4.16.0\n + urllib3==2.8.0",
+      "pip_check_ok": true,
+      "pip_check": "Using Python 3.12.14 environment at: capsule-out/work/candidates/appdirs/attempt-1/venv\nChecked 26 packages in 0.85ms\nAll installed packages are compatible"
+    },
+    "candidate_versions": {
+      "idna": "2.7",
+      "click": "8.5.0",
+      "platformdirs": "4.13.0",
+      "packaging": "26.3",
+      "toml": "0.10.2",
+      "Pygments": "2.21.0",
+      "rich": "15.0.0",
+      "Jinja2": "2.11.3",
+      "iniconfig": "2.3.1",
+      "nose": "1.3.7",
+      "pip": "26.2.1",
+      "pytest": "9.1.1",
+      "requests": "2.31.0",
+      "urllib3": "2.8.0",
+      "mdurl": "0.1.2",
+      "python-dateutil": "2.9.0.post0",
+      "chardet": "5.2.0",
+      "certifi": "2026.7.22",
+      "markdown-it-py": "4.2.0",
+      "pluggy": "1.6.0",
+      "setuptools": "75.8.0",
+      "typing_extensions": "4.16.0",
+      "MarkupSafe": "3.0.4",
+      "pydantic": "1.10.13",
+      "charset-normalizer": "3.5.2",
+      "six": "1.17.0"
+    },
+    "import_probes": [
+      {
+        "module": "platformdirs",
+        "ok": true,
+        "error": "",
+        "traceback_tail": "",
+        "warnings": []
+      }
+    ],
+    "residual_usages_of_old_package": [],
+    "repository_tests": {
+      "baseline": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "candidate": {
+        "passed": 9,
+        "failed": 1,
+        "error": 0,
+        "skipped": 0
+      },
+      "fixed": [],
+      "regressions": {},
+      "still_failing": {
+        "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+      },
+      "missing": []
+    },
+    "ai_written_tests": {
+      "against_original_dependency": {
+        "passed": 2,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "against_replacement": {
+        "passed": 2,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "per_test": [
+        {
+          "test": "test_cache_dir_default",
+          "original": "passed",
+          "replacement": "passed"
+        },
+        {
+          "test": "test_cache_dir_env_var",
+          "original": "passed",
+          "replacement": "passed"
+        }
+      ]
+    },
+    "warnings_attributed_before": 0,
+    "warnings_attributed_after": 0,
+    "verdict": "verified",
+    "verdict_reasons": [
+      "no regressions; every baseline problem attributed to this dependency is resolved"
+    ]
+  },
+  "compatibility_gaps": [
+    {
+      "provenance": "measured",
+      "text": "Still failing (may be another dependency): tests/test_report.py::test_report_renders_all_sites: ImportError: cannot import name 'soft_unicode' from 'markupsafe' (site-packages/markupsafe/__init__.py)"
+    },
+    {
+      "provenance": "ai",
+      "text": "platformdirs.user_cache_dir is a drop-in replacement for appdirs.user_cache_dir for the usage pattern found in this repository."
+    }
+  ],
+  "open_concerns": [
+    {
+      "provenance": "ai",
+      "text": "There may be minor differences in the default cache directory paths chosen by platformdirs versus appdirs on some operating systems, which could lead to the application not finding existing caches after the migration."
+    },
+    {
+      "provenance": "observed",
+      "text": "Verification is only as strong as the repository's own test suite plus the AI-written tests; code paths no test exercises are not proven safe."
+    },
+    {
+      "provenance": "observed",
+      "text": "Each dependency is verified in isolation, then all verified plans are applied together once; other combinations are not tested."
+    }
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "model": "gemma-4-31b-it",
+      "backend": "google",
+      "seconds": 267.5,
+      "decision": "replace",
+      "verdict": "verified",
+      "reasons": [
+        "no regressions; every baseline problem attributed to this dependency is resolved"
+      ]
+    }
+  ]
+}
