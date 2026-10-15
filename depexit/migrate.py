@@ -18,8 +18,8 @@ from pathlib import Path
 from . import env as envmod
 from . import pypi
 from .analyze import Baseline, DepProfile, _attribute_warning
-from .gemma import Gemma, GemmaError, plan_prompt, repair_prompt
-from .manifest import normalize, parse_requirement
+from .gemma import Gemma, GemmaError, plan_problems, plan_prompt, repair_prompt
+from .manifest import normalize, parse_requirement, read_manifest, spec_conflicts
 from .scan import SKIP_DIRS, scan, text_references
 
 MAX_FILE_LINES = 400
@@ -417,8 +417,18 @@ def verify(b: Baseline, p: DepProfile, plan: dict, work: Path, python_cmd: str, 
         a.ai_tests = {"file": ai_rel, "candidate": cres.to_dict(), "original": bres.to_dict(),
                       "code": (root / ai_rel).read_text(encoding="utf-8")}
 
+    # did the plan actually remove each risk? (re-inspect the changed copy)
+    a.comparison["indicators"] = _indicator_resolution(p, root, a, plan, b)
+    unresolved = [x for x in a.comparison["indicators"] if x["resolved"] is False and x["severity"] != "low"]
+
     # verdict
     reasons = []
+    if not a.diff.strip():
+        a.verdict = "no-change"
+        a.verdict_reasons = ["the plan made no change to the repository, so nothing was fixed"]
+        return a
+    if unresolved:
+        reasons.append("risk still present: " + ", ".join(f"{x['id']} ({x['detail']})" for x in unresolved))
     if any(not x["applied"] for x in a.edits):
         reasons.append(f"{sum(not x['applied'] for x in a.edits)} code edit(s) could not be applied")
     if regress:
@@ -447,8 +457,72 @@ def verify(b: Baseline, p: DepProfile, plan: dict, work: Path, python_cmd: str, 
         reasons.append("plan references a package that does not exist")
     hard = regress or missing or run.collection_error or any("does not import" in r or "exist" in r for r in reasons)
     a.verdict = "failed" if hard else ("verified" if not reasons else "partial")
-    a.verdict_reasons = reasons or ["no regressions; every baseline problem attributed to this dependency is resolved"]
+    resolved_ids = [x["id"] for x in a.comparison["indicators"] if x["resolved"]]
+    a.verdict_reasons = reasons or [
+        "no regressions; resolved " + (", ".join(resolved_ids) if resolved_ids else "all measured problems")]
     return a
+
+
+def _version_newer(a: str | None, b: str | None) -> bool:
+    from .pypi import _version_key
+    try:
+        return bool(a and b) and _version_key(a) > _version_key(b)
+    except Exception:  # noqa: BLE001 - odd version strings: treat as not newer
+        return False
+
+
+def _indicator_resolution(p: DepProfile, root: Path, a: Attempt, plan: dict, b: Baseline) -> list[dict]:
+    """Re-check every risk indicator against the CHANGED copy. True / False / None (not checkable)."""
+    man = read_manifest(root)
+    declared = p.key in man.by_key()
+    sres = scan(root)
+    mods = set(p.modules) or {p.key.replace("-", "_")}
+    code = [u for u in sres.usages if u.module in mods]
+    imported = any(u.kind in ("import", "from-import") for u in code)
+    gone = not declared and not imported
+    cand_ver = next((v for k, v in a.candidate_versions.items() if normalize(k) == p.key), None)
+    upgraded = _version_newer(cand_ver, p.installed_version)
+    cmp = a.comparison
+    out = []
+    for ind in p.indicators:
+        i, r, detail = ind.id, None, ""
+        if i in ("IMPORT_FAILS",):
+            r = all(pr["ok"] for pr in a.import_probes if pr["module"] in p.modules) or gone
+            detail = "imports cleanly" if r else "import still fails"
+        elif i in ("TEST_FAILURES", "TRANSITIVE_BREAKAGE"):
+            r = not cmp.get("owned_failures_unresolved")
+            detail = "attributed failures now pass" if r else "attributed failures still fail"
+        elif i == "DEPRECATION_WARNINGS":
+            r = not cmp.get("remaining_warnings")
+            detail = f"{len(cmp.get('remaining_warnings') or [])} attributed warning(s) left"
+        elif i == "SPEC_CONFLICT":
+            r = p.key not in {c["package"] for c in spec_conflicts(man)}
+            detail = "manifests agree" if r else "manifests still disagree"
+        elif i == "UNDECLARED":
+            r = declared or not imported
+            detail = "now declared" if declared else ("no longer imported" if r else "still imported, still undeclared")
+        elif i == "UNUSED":
+            r = not declared
+            detail = "removed from manifests" if r else "still declared"
+        elif i in ("PRIVATE_API", "MONKEYPATCH"):
+            kind = "private-api" if i == "PRIVATE_API" else "monkeypatch"
+            left = [f"{u.file}:{u.line}" for u in code if u.kind == kind]
+            r = not left
+            detail = "no longer used" if r else "still at " + ", ".join(left)
+        elif i in ("STALE_UPSTREAM", "REPO_ARCHIVED", "INACTIVE"):
+            r = gone
+            detail = "package no longer used" if r else "package still used (an upgrade cannot fix an inactive upstream)"
+        elif i in ("OUTDATED_PIN", "OLD_PIN", "YANKED"):
+            r = gone or upgraded
+            detail = (f"now {cand_ver}" if upgraded else "package no longer used") if r else f"still {cand_ver}"
+        elif i == "UNPINNED":
+            specs = [d.spec for d in man.by_key().get(p.key, [])]
+            r = not declared or all(specs)
+            detail = "constrained" if r else "still unconstrained"
+        else:
+            detail = "informational"
+        out.append({"id": i, "severity": ind.severity, "resolved": r, "detail": detail})
+    return out
 
 
 @dataclass
@@ -462,7 +536,7 @@ class Migration:
         done = [a for a in self.attempts if a.plan]
         if not done:
             return None
-        rank = {"verified": 0, "partial": 1, "failed": 2, "not-executed": 3}
+        rank = {"verified": 0, "partial": 1, "no-change": 2, "failed": 3, "not-executed": 4}
         return sorted(done, key=lambda a: (rank[a.verdict], -a.number))[0]
 
 
@@ -485,6 +559,13 @@ def migrate(b: Baseline, p: DepProfile, gemma: Gemma, python_cmd: str, installer
         m.attempts.append(a)
         if not ex.parsed:
             log(f"  {p.name}: attempt {n} returned no usable JSON")
+            continue
+        problems = plan_problems(ex.parsed)
+        if problems:
+            a.verdict, a.verdict_reasons = "failed", ["malformed plan: " + "; ".join(problems)]
+            log(f"  {p.name}: attempt {n} plan rejected before applying ({'; '.join(problems)})")
+            prompt = repair_prompt(base_prompt, ex.parsed, "The tool rejected your reply before applying it: "
+                                   + "; ".join(problems) + ". Return the complete JSON object with every field.")
             continue
         a.plan_checks = _check_plan(ex.parsed, b.work / "registry-cache")
         log(f"  {p.name}: attempt {n} plan = {ex.parsed.get('decision')} -> "

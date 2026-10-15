@@ -163,3 +163,15 @@ def test_ssl_context_falls_back_to_a_ca_bundle_when_store_is_empty(monkeypatch):
         assert ctx.cert_store_stats()["x509_ca"] > 0          # a real bundle was loaded
     finally:
         net.ssl_context.cache_clear()
+
+
+def test_truncated_reply_is_rejected_not_mined_for_nested_objects():
+    """Regression: a Gemma reply cut off mid-object once yielded its inner 'replacement' dict as the plan."""
+    from depexit.gemma import extract_json, plan_problems
+    truncated = '```json\n{\n  "decision": "upgrade",\n  "replacement": {\n    "package": "requests",\n    "version_spec": "==2.34.2"\n  },\n  "'
+    assert extract_json(truncated) is None
+    assert extract_json('noise {"bad": } then {"ok": 2}') == {"ok": 2}
+    assert plan_problems({"package": "requests"})            # malformed plans are caught
+    assert plan_problems({"decision": "upgrade", "rationale": "r", "requirement_changes": [], "code_edits": []}) == \
+        ["plan changes nothing: no requirement_changes and no code_edits"]
+    assert plan_problems({"decision": "keep", "rationale": "r", "requirement_changes": [], "code_edits": []}) == []

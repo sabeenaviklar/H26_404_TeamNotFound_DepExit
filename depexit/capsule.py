@@ -117,15 +117,16 @@ def dependency_capsule(meta: dict, b, p, mig) -> dict:
         "residual_usages_of_old_package": final.residual_usages,
         "repository_tests": {
             "baseline": cmp.get("baseline_counts"), "candidate": cmp.get("candidate_counts"),
-            "fixed": cmp.get("fixed"), "regressions": cmp.get("regressions"),
-            "still_failing": cmp.get("still_failing"), "missing": cmp.get("missing_tests"),
+            "fixed": cmp.get("fixed") or [], "regressions": cmp.get("regressions") or {},
+            "still_failing": cmp.get("still_failing") or {}, "missing": cmp.get("missing_tests") or [],
         },
+        "risk_indicators_after_change": cmp.get("indicators") or [],
         "ai_written_tests": {
             "against_original_dependency": (ai_t.get("original") or {}).get("counts"),
             "against_replacement": (ai_t.get("candidate") or {}).get("counts"),
             "per_test": _ai_matrix(ai_t),
         } if ai_t else None,
-        "warnings_attributed_before": cmp.get("baseline_warnings_for_dep"),
+        "warnings_attributed_before": cmp.get("baseline_warnings_for_dep") or 0,
         "warnings_attributed_after": len(cmp.get("remaining_warnings") or []),
         "verdict": final.verdict, "verdict_reasons": final.verdict_reasons,
     }
@@ -247,6 +248,11 @@ def capsule_markdown(c: dict) -> str:
               f"- Warnings attributed to this dependency: {ex['warnings_attributed_before']} before → {ex['warnings_attributed_after']} after"]
         for pr2 in ex["import_probes"]:
             L.append(f"- `import {pr2['module']}` in candidate: {'ok' if pr2['ok'] else 'FAILS: ' + _md(pr2['error'])}")
+        if ex.get("risk_indicators_after_change"):
+            L += ["", "| Risk indicator | Resolved by this change? | Re-checked on the changed copy |", "|---|---|---|"]
+            for x in ex["risk_indicators_after_change"]:
+                mark = {True: "yes", False: "**no**", None: "n/a"}[x["resolved"]]
+                L.append(f"| {x['id']} | {mark} | {_md(x['detail'])} |")
         if ex.get("ai_written_tests"):
             L += ["", "| AI-written test | Original dependency | Replacement |", "|---|---|---|"]
             for row in ex["ai_written_tests"]["per_test"]:

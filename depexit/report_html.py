@@ -31,7 +31,7 @@ tr:last-child td{border-bottom:0}
 .lv{font-weight:600;font-size:12.5px}.lv-critical{color:var(--crit)}.lv-high{color:var(--high)}.lv-medium{color:var(--med)}.lv-low,.lv-none{color:var(--low)}
 .st{font:600 11px/1 ui-monospace,Menlo,monospace;padding:4px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
 .st-verified{color:var(--ver)}.st-partial{color:var(--med)}.st-failed{color:var(--crit)}.st-not-required,.st-not-attempted{color:var(--low)}
-.st-ai-unavailable,.st-no-usable-plan{color:var(--high)}
+.st-ai-unavailable,.st-no-usable-plan,.st-no-change{color:var(--high)}
 details.dep{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:12px 0}
 details.dep>summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 details.dep>summary::-webkit-details-marker{display:none}
@@ -143,6 +143,11 @@ def dep_section(c: dict) -> str:
                  f'<div><span>Warnings for this dep</span> {ex["warnings_attributed_before"]}<span class="arrow">→</span>{ex["warnings_attributed_after"]}</div>'
                  f'<div><span>Fixed</span> {e(", ".join(t.split("::")[-1] for t in rt["fixed"]) or "none")} · '
                  f'<span>Regressions</span> {e(", ".join(rt["regressions"]) or "none")}</div></div>')
+        if ex.get("risk_indicators_after_change"):
+            h.append(f'<p class="small">Each risk re-checked on the changed copy {tag("measured")}</p>'
+                     '<table><tr><th>Risk indicator</th><th>Resolved?</th><th>Re-check</th></tr>' +
+                     "".join(f'<tr><td><b>{e(x["id"])}</b></td><td>{ {True: "<span class=pass>yes</span>", False: "<span class=fail>no</span>", None: "<span class=small>n/a</span>"}[x["resolved"]] }</td>'
+                             f'<td class="mono">{e(x["detail"])}</td></tr>' for x in ex["risk_indicators_after_change"]) + "</table>")
         if ex.get("ai_written_tests"):
             h.append(f'<p class="small">AI-written tests {tag("ai")} executed against both dependency sets {tag("measured")}</p>'
                      '<table><tr><th>Test</th><th>Original dependency</th><th>Replacement</th></tr>' +

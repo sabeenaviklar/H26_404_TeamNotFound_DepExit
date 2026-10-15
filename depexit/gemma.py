@@ -122,7 +122,7 @@ class Gemma:
             body = {
                 "systemInstruction": {"parts": [{"text": SYSTEM}]},
                 "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-                "generationConfig": {"temperature": self.temperature, "maxOutputTokens": 8192},
+                "generationConfig": {"temperature": self.temperature, "maxOutputTokens": 16384},
             }
             if getattr(self, "inline_system", False):
                 body.pop("systemInstruction")
@@ -131,10 +131,14 @@ class Gemma:
             cands = data.get("candidates") or []
             if not cands:
                 raise GemmaError(f"no candidates returned: {json.dumps(data)[:400]}")
+            finish = cands[0].get("finishReason", "")
             parts = cands[0].get("content", {}).get("parts", [])
             # Gemma 4 may return a separate reasoning part flagged as thought; keep the answer parts
             text = "".join(p.get("text", "") for p in parts if not p.get("thought"))
-            return text, data.get("usageMetadata", {})
+            usage = dict(data.get("usageMetadata", {}), finishReason=finish)
+            if finish and finish != "STOP":
+                print(f"[depexit] {self.model}: reply ended with finishReason={finish} ({len(text)} chars)", flush=True)
+            return text, usage
         if self.backend == "ollama":
             body = {"model": self.model, "stream": False, "format": "json",
                     "options": {"temperature": self.temperature, "num_ctx": 16384},
@@ -204,6 +208,11 @@ class Gemma:
 
 
 def extract_json(text: str) -> dict | None:
+    """Return the first complete TOP-LEVEL JSON object in a model reply.
+
+    A reply cut off mid-object must yield None (so the caller retries), never a
+    nested object from inside it: that once turned a truncated plan into a bogus one.
+    """
     if not text:
         return None
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text.strip(), flags=re.M)
@@ -212,17 +221,21 @@ def extract_json(text: str) -> dict | None:
         return v if isinstance(v, dict) else None
     except json.JSONDecodeError:
         pass
-    start = text.find("{")
-    while start != -1:
-        depth, in_str, esc = 0, False, False
-        for i in range(start, len(text)):
-            ch = text[i]
+    i, n = 0, len(text)
+    while True:
+        start = text.find("{", i)
+        if start == -1:
+            return None
+        depth, in_str, esc, end = 0, False, False, None
+        for j in range(start, n):
+            ch = text[j]
             if in_str:
-                esc = (ch == "\\" and not esc)
-                if ch == '"' and not esc:
-                    in_str = False
-                elif ch != "\\":
+                if esc:
                     esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    in_str = False
                 continue
             if ch == '"':
                 in_str = True
@@ -231,14 +244,34 @@ def extract_json(text: str) -> dict | None:
             elif ch == "}":
                 depth -= 1
                 if depth == 0:
-                    try:
-                        v = json.loads(text[start:i + 1])
-                        if isinstance(v, dict):
-                            return v
-                    except json.JSONDecodeError:
-                        break
-        start = text.find("{", start + 1)
-    return None
+                    end = j
+                    break
+        if end is None:
+            return None            # unbalanced: the reply was truncated
+        try:
+            v = json.loads(text[start:end + 1])
+            if isinstance(v, dict):
+                return v
+        except json.JSONDecodeError:
+            pass
+        i = end + 1                # skip past this object, never into it
+
+
+REQUIRED_PLAN_KEYS = ("decision", "rationale", "requirement_changes", "code_edits")
+DECISIONS = ("replace", "upgrade", "remove", "pin", "keep")
+
+
+def plan_problems(plan: dict) -> list[str]:
+    """Deterministic shape check on a model plan before anything is applied."""
+    probs = [f"missing field '{k}'" for k in REQUIRED_PLAN_KEYS if k not in plan]
+    if plan.get("decision") not in DECISIONS:
+        probs.append(f"decision must be one of {', '.join(DECISIONS)} (got {plan.get('decision')!r})")
+    for k in ("requirement_changes", "code_edits", "suggested_tests"):
+        if k in plan and not isinstance(plan[k], list):
+            probs.append(f"'{k}' must be a list")
+    if plan.get("decision") != "keep" and not plan.get("requirement_changes") and not plan.get("code_edits"):
+        probs.append("plan changes nothing: no requirement_changes and no code_edits")
+    return probs
 
 
 def plan_prompt(ctx: dict) -> str:
