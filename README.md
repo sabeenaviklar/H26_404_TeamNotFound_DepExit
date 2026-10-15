@@ -163,7 +163,7 @@ The target repository LinkWatch remains in this fork unchanged (`linkwatch/`, `t
 | Field | Value |
 |---|---|
 | Model name | Gemma 4 (instruction-tuned) |
-| Model version | `gemma-4-31b-it` by default. `gemma-4-26b-a4b-it` also works (`--model`). |
+| Model version | `gemma-4-31b-it` by default. If that model is rate-limited or has no quota on the key, DepExit falls back to `gemma-4-26b-a4b-it` automatically and records which model produced each plan. |
 | Model source | Google DeepMind, open-weight Gemma family |
 | Access method | Hosted: Gemini API `v1beta/models/{model}:generateContent` over REST with a free Google AI Studio API key (`GEMINI_API_KEY`, sent as the `x-goog-api-key` header). Local alternative: Ollama `/api/chat` with a Gemma 4 build. |
 | License / usage terms | Gemma 4 weights are released under Apache 2.0. Hosted access is additionally subject to the Gemini API Terms of Service and Google's Generative AI Prohibited Use Policy. No paid services are used. |

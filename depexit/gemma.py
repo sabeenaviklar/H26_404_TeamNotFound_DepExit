@@ -21,6 +21,17 @@ from dataclasses import dataclass, field
 from .net import ssl_context
 
 DEFAULT_MODEL = {"google": "gemma-4-31b-it", "ollama": "gemma4"}
+FALLBACKS = {"gemma-4-31b-it": ["gemma-4-26b-a4b-it"], "gemma-4-26b-a4b-it": ["gemma-4-31b-it"]}
+
+
+def _api_reason(msg: str) -> str:
+    """Pull Google's status and message out of an error body for a readable log line."""
+    code = re.search(r"HTTP (\d+)", msg)
+    status = re.search(r'"status":\s*"([A-Z_]+)"', msg)
+    text = re.search(r'"message":\s*"([^"]{0,220})', msg)
+    parts = [p for p in (code and f"HTTP {code.group(1)}", status and status.group(1),
+                         text and text.group(1)) if p]
+    return " ".join(parts) or msg[:240]
 
 SYSTEM = """You are a careful Python dependency-migration engineer working inside an automated tool.
 The tool has already inspected and executed the repository. You receive its evidence and must propose
@@ -113,19 +124,10 @@ class Gemma:
                 "contents": [{"role": "user", "parts": [{"text": prompt}]}],
                 "generationConfig": {"temperature": self.temperature, "maxOutputTokens": 8192},
             }
-            for attempt in range(6):
-                try:
-                    data = self._post(url, body, {"x-goog-api-key": self.key})
-                    break
-                except GemmaError as e:
-                    if any(c in str(e) for c in ("HTTP 429", "HTTP 500", "HTTP 503", "HTTP 504")):
-                        wait = min(60, 10 * (attempt + 1))
-                        print(f"[depexit] Gemini API busy/rate-limited, retrying in {wait}s", flush=True)
-                        time.sleep(wait)
-                        continue
-                    raise
-            else:
-                raise GemmaError("Gemini API kept returning rate-limit/server errors")
+            if getattr(self, "inline_system", False):
+                body.pop("systemInstruction")
+                body["contents"][0]["parts"][0]["text"] = SYSTEM + "\n\n" + prompt
+            data = self._google_with_fallback(body)
             cands = data.get("candidates") or []
             if not cands:
                 raise GemmaError(f"no candidates returned: {json.dumps(data)[:400]}")
@@ -142,6 +144,48 @@ class Gemma:
             return data.get("message", {}).get("content", ""), {
                 "prompt_tokens": data.get("prompt_eval_count"), "output_tokens": data.get("eval_count")}
         raise GemmaError(f"unknown backend {self.backend}")
+
+    def _google_once(self, model: str, body: dict) -> dict:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        waits = [5, 15, 30]
+        for attempt in range(len(waits) + 1):
+            try:
+                return self._post(url, body, {"x-goog-api-key": self.key})
+            except GemmaError as e:
+                msg = str(e)
+                if "HTTP 400" in msg and "instruction" in msg.lower() and "systemInstruction" in body:
+                    # some hosted Gemma versions reject system instructions: fold them into the prompt
+                    sys_text = body.pop("systemInstruction")["parts"][0]["text"]
+                    first = body["contents"][0]["parts"][0]
+                    first["text"] = sys_text + "\n\n" + first["text"]
+                    print(f"[depexit] {model}: system instruction not supported, sending it inline", flush=True)
+                    self.inline_system = True
+                    continue
+                transient = any(c in msg for c in ("HTTP 429", "HTTP 500", "HTTP 503", "HTTP 504"))
+                hard_quota = "HTTP 429" in msg and ("limit: 0" in msg or "PerDay" in msg or "per day" in msg.lower())
+                reason = _api_reason(msg)
+                if not transient or hard_quota or attempt == len(waits):
+                    raise GemmaError(f"{model}: {reason}") from None
+                print(f"[depexit] {model}: {reason} -> retrying in {waits[attempt]}s", flush=True)
+                time.sleep(waits[attempt])
+        raise GemmaError(f"{model}: unavailable")
+
+    def _google_with_fallback(self, body: dict) -> dict:
+        """Try the chosen Gemma 4 model, then the other Gemma 4 size if it is rate-limited."""
+        order = [self.model] + [m for m in FALLBACKS.get(self.model, []) if m != self.model]
+        errors = []
+        for model in order:
+            try:
+                data = self._google_once(model, body)
+                if model != self.model:
+                    print(f"[depexit] switched to {model} for the rest of the run", flush=True)
+                    self.model = model
+                return data
+            except GemmaError as e:
+                errors.append(str(e))
+                if not any(c in str(e) for c in ("429", "500", "503", "504", "RESOURCE_EXHAUSTED", "UNAVAILABLE")):
+                    break
+        raise GemmaError(" | ".join(errors))
 
     # -- public ----------------------------------------------------------
     def ask_json(self, prompt: str) -> Exchange:
