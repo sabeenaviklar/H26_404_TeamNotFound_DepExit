@@ -34,6 +34,49 @@ def _resolve(cmd: list[str]) -> str | None:
     return lines[0] if len(lines) == 2 and lines[1] in ("3.12", "3.13") else None
 
 
+ECOSYSTEMS = [
+    ("Python", ("requirements.txt", "pyproject.toml", "setup.py", "setup.cfg", "Pipfile", "poetry.lock")),
+    ("Node.js / JavaScript", ("package.json",)),
+    ("Go", ("go.mod",)),
+    ("Rust", ("Cargo.toml",)),
+    ("Java / Kotlin", ("pom.xml", "build.gradle", "build.gradle.kts")),
+    ("Ruby", ("Gemfile",)),
+    ("PHP", ("composer.json",)),
+    (".NET", ("*.csproj", "*.sln")),
+]
+
+
+def detect_ecosystems(repo: Path) -> dict[str, list[str]]:
+    """Which package ecosystems a repository uses, judged by manifest files at its root."""
+    found: dict[str, list[str]] = {}
+    for name, patterns in ECOSYSTEMS:
+        hits = sorted({p.name for pat in patterns for p in repo.glob(pat)})
+        if name == "Python":
+            hits += sorted(p.name for p in repo.glob("requirements*.txt") if p.name not in hits)
+        if hits:
+            found[name] = hits
+    return found
+
+
+def write_unsupported(out: Path, target: dict, eco: dict) -> None:
+    """A truthful report for a repository DepExit cannot analyse yet."""
+    from html import escape as e
+    from .report_html import CSS
+    out.mkdir(parents=True, exist_ok=True)
+    found = ", ".join(f"{k} ({', '.join(v)})" for k, v in eco.items()) or "no recognised dependency manifest"
+    msg = (f"This repository is not a Python project. Detected: {found}. "
+           "DepExit currently analyses Python repositories only; nothing was installed, tested or sent to the model.")
+    index = {"target": target, "supported": False, "ecosystems": eco, "message": msg, "dependencies": []}
+    (out / "capsule-index.json").write_text(json.dumps(index, indent=2), encoding="utf-8")
+    (out / "SUMMARY.md").write_text(f"# DepExit run on `{target['source']}`\n\n{msg}\n", encoding="utf-8")
+    (out / "report.html").write_text(
+        f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+        f"<title>DepExit Report</title><style>{CSS}</style></head><body><main><h1>Dependency Exit Report</h1>"
+        f"<div class='meta'><code>{e(target['source'])}</code> @ <code>{e((target.get('commit') or '')[:10])}</code></div>"
+        f"<div class='box' style='margin-top:24px'><b>Not analysed: unsupported ecosystem.</b><p>{e(msg)}</p></div>"
+        f"</main></body></html>", encoding="utf-8")
+
+
 def find_python(pref: str | None) -> str:
     """Find a Python 3.12/3.13 for the target. Accepts paths or launchers like 'py -3.12'."""
     import shlex
@@ -72,9 +115,13 @@ def prepare_target(target: str, work: Path) -> tuple[Path, dict]:
     if dst.exists():
         shutil.rmtree(dst)
     if target.startswith(("http://", "https://", "git@")):
-        r = envmod.run(["git", "clone", "--quiet", "--depth", "1", target, dst], timeout=600)
+        e = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+        r = envmod.run(["git", "clone", "--quiet", "--depth", "1", target, dst], timeout=600, env=e)
         if not r.ok:
-            raise SystemExit(f"git clone failed:\n{r.tail()}")
+            hint = ("repository not found, or it is private (DepExit clones public repositories; "
+                    "for a private one, clone it yourself and pass the local folder)"
+                    if "Username" in r.tail() or "not found" in r.tail().lower() else r.tail())
+            raise SystemExit(f"could not clone {target}: {hint}")
     else:
         src = Path(target).resolve()
         if not src.is_dir():
@@ -124,6 +171,16 @@ def cmd_analyze(args) -> int:
         f"AI {gemma.label if gemma else 'off'}")
 
     repo, target = prepare_target(args.target, work)
+    eco = detect_ecosystems(repo)
+    has_py = "Python" in eco or any(repo.rglob("*.py"))
+    if not has_py:
+        write_unsupported(out, target, eco)
+        log(f"not a Python repository (detected: {', '.join(eco) or 'no known manifest'}); "
+            f"DepExit supports Python only. Wrote {out / 'report.html'}")
+        return 2
+    others = [k for k in eco if k != "Python"]
+    if others:
+        log(f"note: this repository also uses {', '.join(others)}; only its Python dependencies are analysed")
     b = build_baseline(repo, work, python_cmd, installer, not args.no_pyproject_check, log)
     target["python"] = b.inventory.get("python")
 
@@ -152,6 +209,7 @@ def cmd_analyze(args) -> int:
                 migrations[key] = fut.result()
     comb = combined(b, list(migrations.values()), python_cmd, installer, log) if migrations else None
 
+    target["other_ecosystems_not_analysed"] = {k: v for k, v in eco.items() if k != "Python"}
     meta = {"target": target, "settings": {
         "python": python_cmd, "installer": installer, "ai": gemma.label if gemma else "off",
         "attempts": args.attempts, "selected": [p.name for p in selected]}}

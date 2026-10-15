@@ -41,6 +41,8 @@ Yes, on any Python repository with the usual structure. Nothing in DepExit is sp
 
 As a check, we ran it with no AI (`--ai none`) on a second, unrelated project, [jazzband/prettytable](https://github.com/jazzband/prettytable) (`src/` layout, test extras in `pyproject.toml`). DepExit installed it, ran all 337 of its tests, and ranked its 7 dependencies. That run uncovered four layout bugs (src-layout installs, local-module detection, type-stub packages, compiled mypy helpers), which were fixed the same day.
 
+On a repository in another language (JavaScript, Go, Rust, Java, Ruby, PHP, .NET), DepExit detects the ecosystem from its manifest files, installs and sends nothing, and writes a report that says so. A repository that mixes Python with another language has its Python dependencies analysed, and the report names what was left out.
+
 It does **not** yet support Poetry or Pipenv lock files, `setup.py`-only projects without pyproject, non-Python ecosystems, or test suites that need external services such as a database.
 
 ## 1. Problem and solution overview

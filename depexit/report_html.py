@@ -192,6 +192,7 @@ def page(s: dict, caps: list[dict]) -> str:
 <title>DepExit Report</title><style>{CSS}</style></head><body><main>
 <h1>Dependency Exit Report</h1>
 <div class="meta"><code>{e(tgt.get("source", ""))}</code> @ <code>{e((tgt.get("commit") or "")[:10])}</code> · Python {e(str(tgt.get("python")))} · AI: {e(s["ai"])} · {e(s["generated_at"])}</div>
+{('<div class="box" style="margin-top:16px">Also uses ' + e(", ".join(f"{k} ({', '.join(v)})" for k, v in tgt.get("other_ecosystems_not_analysed", {}).items())) + ': not analysed; DepExit covers the Python dependencies only.</div>') if tgt.get("other_ecosystems_not_analysed") else ""}
 <div class="legend"><span>{tag("observed")} read from files or registries</span><span>{tag("measured")} produced by execution</span>
 <span>{tag("ai")} Gemma proposal, unverified</span><span>{tag("verified")} Gemma proposal confirmed by execution</span></div>
 <div class="stats">

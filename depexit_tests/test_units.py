@@ -175,3 +175,13 @@ def test_truncated_reply_is_rejected_not_mined_for_nested_objects():
     assert plan_problems({"decision": "upgrade", "rationale": "r", "requirement_changes": [], "code_edits": []}) == \
         ["plan changes nothing: no requirement_changes and no code_edits"]
     assert plan_problems({"decision": "keep", "rationale": "r", "requirement_changes": [], "code_edits": []}) == []
+
+
+def test_detect_ecosystems(tmp_path):
+    from depexit.cli import detect_ecosystems
+    (tmp_path / "package.json").write_text("{}")
+    (tmp_path / "requirements-dev.txt").write_text("pytest\n")
+    eco = detect_ecosystems(tmp_path)
+    assert eco["Node.js / JavaScript"] == ["package.json"]
+    assert eco["Python"] == ["requirements-dev.txt"]
+    assert "Go" not in eco
