@@ -31,6 +31,18 @@ What Gemma proposed, in its own patches: Jinja2 upgraded past the MarkupSafe bre
 
 One honest note: an earlier run marked `requests` verified although Gemma's reply had been truncated and nothing was changed. We found it by reading our own capsule, fixed the parser and added plan validation and per-indicator re-checks (see commit history), and re-ran. The committed run is the fixed one.
 
+## Does it work on other repositories?
+
+Yes, on any Python repository with the usual structure. Nothing in DepExit is specific to LinkWatch. It needs:
+
+- dependencies declared in `requirements*.txt` and/or a PEP 621 `pyproject.toml` (flat or `src/` layout, test extras and dependency groups included);
+- a test suite pytest can run (plain `unittest` tests also run under pytest);
+- a project that installs on Python 3.12 or 3.13.
+
+As a check, we ran it with no AI (`--ai none`) on a second, unrelated project, [jazzband/prettytable](https://github.com/jazzband/prettytable) (`src/` layout, test extras in `pyproject.toml`). DepExit installed it, ran all 337 of its tests, and ranked its 7 dependencies. That run uncovered four layout bugs (src-layout installs, local-module detection, type-stub packages, compiled mypy helpers), which were fixed the same day.
+
+It does **not** yet support Poetry or Pipenv lock files, `setup.py`-only projects without pyproject, non-Python ecosystems, or test suites that need external services such as a database.
+
 ## 1. Problem and solution overview
 
 Maintainers usually find out a dependency is rotten when something breaks. The target repository for this challenge, [rishrek/LinkWatch](https://github.com/rishrek/LinkWatch), is a good example. When you install it exactly as its README says on Python 3.12, one of its ten tests already fails, its `make test-nose` target crashes, and several more problems sit quietly in the manifests waiting for the next upgrade. An AI assistant can suggest fixes for all of this, but a suggestion is not evidence, and a wrong migration in a healthy project is worse than no migration at all.
@@ -191,7 +203,7 @@ The target repository LinkWatch remains in this fork unchanged (`linkwatch/`, `t
 
 - **Verification is bounded by tests.** A plan is proven only on what LinkWatch's ten tests plus Gemma's tests exercise. Untested code paths can still break, and the capsule says so.
 - **Isolation then one combination.** Each dependency is migrated and verified on its own, then all verified plans are applied together once. Other subsets and orders are not tested, and two plans that edit the same line can conflict (reported as an unapplied edit in the combined run).
-- **Python only.** Manifests supported: `requirements*.txt` and PEP 621 `pyproject.toml`. Poetry, Pipenv, conda and `setup.py` are not parsed.
+- **Python only.** Manifests supported: `requirements*.txt` and PEP 621 `pyproject.toml`. Poetry, Pipenv, conda and `setup.py` are not parsed. pytest plugins used only through configuration (for example `pytest-cov` via `--cov`) can be reported as unused.
 - **Attribution heuristics.** Failures are blamed on the innermost third-party frame and on modules named in the exception. Warnings are blamed by site-packages path, by the repo line that uses a package, or by the package name in the message. This is right for LinkWatch but can misattribute in unusual tracebacks.
 - **Model variance.** Gemma's plans differ between runs. The verdict tells you whether a given plan held up, not that the best plan was found. The free API tier is rate-limited, and DepExit backs off and retries, which can slow a full run.
 - **Registry signals are a snapshot.** Staleness and archive status come from public metadata at run time. Security advisories are deliberately out of scope for this challenge.

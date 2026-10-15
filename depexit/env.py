@@ -114,6 +114,46 @@ def install(env: Env, args: list[str], cwd: Path, step: str) -> CmdResult:
     return env.record(step, run(cmd, cwd=cwd))
 
 
+TEST_GROUPS = ("test", "tests", "testing", "dev")
+
+
+def install_args(root: Path, req_files: list[str]) -> list[str]:
+    """What to install so the repository's own tests can run.
+
+    Requirements files are used as written. The project itself is added when there are no
+    requirements files or when it uses a src/ layout (tests then need it installed), and the
+    test extras / dependency groups declared in pyproject.toml are added as plain requirements.
+    """
+    import tomllib
+    args: list[str] = []
+    for f in req_files:
+        if (root / f).exists():
+            args += ["-r", f]
+    pp = root / "pyproject.toml"
+    data = {}
+    if pp.exists():
+        try:
+            data = tomllib.loads(pp.read_text(encoding="utf-8"))
+        except (tomllib.TOMLDecodeError, UnicodeDecodeError):
+            data = {}
+    has_project = bool(data.get("project")) or (root / "setup.py").exists()
+    if has_project and (not args or (root / "src").is_dir()):
+        args.append(".")
+    extras = (data.get("project") or {}).get("optional-dependencies") or {}
+    groups = data.get("dependency-groups") or {}
+    for name in TEST_GROUPS:
+        for spec in list(extras.get(name, [])) + list(groups.get(name, [])):
+            if isinstance(spec, str):
+                args.append(spec)
+    if not args:
+        args.append(".")
+    if not any(a.split("[")[0].split("=")[0].split(">")[0].strip().lower() == "pytest" for a in args) \
+            and not any("pytest" in (root / f).read_text(encoding="utf-8", errors="replace")
+                        for f in req_files if (root / f).exists()):
+        args.append("pytest")
+    return args
+
+
 def pip_check(env: Env) -> CmdResult:
     if env.installer == "uv":
         return env.record("pip-check", run(["uv", "pip", "check", "--python", env.python]))
@@ -136,6 +176,11 @@ _ABS_SITE = re.compile(r"[^\s'\"(]*[/\\]site-packages[/\\]")
 def short_paths(text: str) -> str:
     """Strip machine-specific venv prefixes so evidence is portable."""
     return _ABS_SITE.sub("site-packages/", text or "")
+
+
+def probeable(module: str) -> bool:
+    """Skip names that can never be imported: stub-only packages and compiled helper modules."""
+    return module.isidentifier() and not module.endswith(("-stubs", "_stubs")) and "__mypyc" not in module
 
 
 def import_probe(env: Env, module: str, cwd: Path) -> dict:
@@ -225,7 +270,8 @@ def pytest(env: Env, repo: Path, label: str, junit: Path, targets: list[str] | N
     if junit.exists():
         junit.unlink()
     e = dict(os.environ)
-    e["PYTHONPATH"] = str(repo) + os.pathsep + e.get("PYTHONPATH", "")
+    paths = [str(repo)] + ([str(repo / "src")] if (repo / "src").is_dir() else [])
+    e["PYTHONPATH"] = os.pathsep.join(paths + [e.get("PYTHONPATH", "")])
     e.pop("PYTHONWARNINGS", None)
     cmd = [env.python, "-m", "pytest", "-q", "-rfE", "-p", "no:cacheprovider",
            "-W", "default", f"--junitxml={junit}", *(targets or [])]

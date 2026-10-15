@@ -313,13 +313,7 @@ def _write_ai_tests(root: Path, key: str, tests: list[dict]) -> str | None:
 
 
 def _install_candidate(e: envmod.Env, root: Path, req_files: list[str]) -> envmod.CmdResult:
-    existing = [f for f in req_files if (root / f).exists()]
-    if existing:
-        args = []
-        for f in existing:
-            args += ["-r", f]
-        return envmod.install(e, args, root, "install:candidate")
-    return envmod.install(e, [".", "pytest"], root, "install:candidate")
+    return envmod.install(e, envmod.install_args(root, req_files), root, "install:candidate")
 
 
 def _warnings_for(run: envmod.TestRun, p: DepProfile, mod_to_dist: dict, usages, root: Path) -> list[dict]:
@@ -366,7 +360,7 @@ def verify(b: Baseline, p: DepProfile, plan: dict, work: Path, python_cmd: str, 
         probe_mods.add(rep["stdlib_module"].split(".")[0])
     if any(normalize(k) == p.key for k in dists):
         probe_mods |= set(p.modules[:3])
-    a.import_probes = [envmod.import_probe(e, m, root) for m in sorted(probe_mods)]
+    a.import_probes = [envmod.import_probe(e, m, root) for m in sorted(probe_mods) if envmod.probeable(m)]
 
     # residual references to the old package after a replace/remove decision
     if plan.get("decision") in ("replace", "remove"):

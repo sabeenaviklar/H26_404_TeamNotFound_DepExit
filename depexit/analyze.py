@@ -119,13 +119,7 @@ def build_baseline(repo: Path, work: Path, python_cmd: str, installer: str,
     if not r.ok:
         raise SystemExit(f"could not create venv with {python_cmd}:\n{r.tail()}")
     req_files = _req_files(repo, man)
-    if req_files:
-        args = []
-        for f in req_files:
-            args += ["-r", f]
-        r = envmod.install(env, args, repo, "install:baseline")
-    else:
-        r = envmod.install(env, [".", "pytest"], repo, "install:baseline")
+    r = envmod.install(env, envmod.install_args(repo, req_files), repo, "install:baseline")
     install_ok, install_error = r.ok, "" if r.ok else r.tail(30)
     log(f"baseline install ({env.installer}): {'ok' if r.ok else 'FAILED'} in {r.seconds}s")
     if not r.ok:
@@ -149,7 +143,8 @@ def build_baseline(repo: Path, work: Path, python_cmd: str, installer: str,
     if check_pyproject and req_files and pp.exists() and "pyproject.toml" in man.files:
         aenv, r = envmod.create(work / "venv-pyproject", python_cmd, installer)
         dev = [a for f in req_files if "dev" in f or "test" in f for a in ("-r", f)]
-        r = envmod.install(aenv, [".", *dev] if dev else [".", "pytest"], repo, "install:pyproject")
+        extras = [a for a in envmod.install_args(repo, []) if a != "."]
+        r = envmod.install(aenv, [".", *dev, *extras], repo, "install:pyproject")
         ainv = envmod.inventory(aenv) if r.ok else {"dists": {}}
         atests = envmod.pytest(aenv, repo, "pyproject-install", work / "evidence" / "pyproject-junit.xml") if r.ok else None
         alt = {"install_ok": r.ok, "install_error": "" if r.ok else r.tail(20),
@@ -215,7 +210,7 @@ def _profiles(repo, man, sres, env, dists, mod_to_dist, tests, alt, work, log):
 
     # import probes for each module of declared / undeclared deps
     for p in profiles.values():
-        for m in p.modules[:4]:
+        for m in [m for m in p.modules if envmod.probeable(m)][:4]:
             p.import_probes.append(envmod.import_probe(env, m, repo))
 
     # attribute failing tests and warnings
@@ -283,7 +278,8 @@ def _indicators(p: DepProfile, conflict, alt, sres):
     if p.relation == "transitive":
         add(Indicator("TRANSITIVE_BREAKAGE", "high", "Undeclared transitive dependency implicated in a failure",
                       f"resolved to {p.installed_version}, appears in failing traceback(s)", "measured:execution"))
-    if p.relation == "direct" and not code_uses and not text_uses:
+    is_stub = p.key.startswith("types-") or p.key.endswith("-stubs")
+    if p.relation == "direct" and not code_uses and not text_uses and not is_stub:
         add(Indicator("UNUSED", "medium" if any(d["spec"].startswith("==") for d in p.declared) else "low",
                       "Declared but never imported or invoked by the repository",
                       "no import, reference or CLI invocation found in code, Makefile, Dockerfile or CI files",

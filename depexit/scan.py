@@ -63,13 +63,18 @@ def iter_files(repo: Path, pattern: str):
 
 
 def _local_modules(repo: Path, files) -> set[str]:
+    """Every module name the repository itself provides, wherever it lives
+    (flat layout, src/ layout, test helper modules, namespace packages)."""
     mods = set()
     for p in files:
         rel = p.relative_to(repo)
         mods.add(rel.parts[0].removesuffix(".py"))
-    for p in repo.iterdir():
-        if p.is_dir() and (p / "__init__.py").exists():
-            mods.add(p.name)
+        mods.add(p.stem)
+        for part in rel.parts[:-1]:
+            mods.add(part)
+    src = repo / "src"
+    if src.is_dir():
+        mods |= {c.name.removesuffix(".py") for c in src.iterdir() if c.is_dir() or c.suffix == ".py"}
     return mods
 
 
@@ -84,7 +89,8 @@ class _Visitor(ast.NodeVisitor):
 
     def _external(self, dotted: str) -> bool:
         top = dotted.split(".")[0]
-        return bool(top) and top not in STDLIB and top not in self.local and top != "__future__"
+        # names starting with "_" are interpreter/typing internals (e.g. _typeshed under TYPE_CHECKING)
+        return bool(top) and not top.startswith("_") and top not in STDLIB and top not in self.local
 
     def _add(self, node, kind, dotted):
         self.out.append(Usage(self.rel, node.lineno, kind, dotted.split(".")[0], dotted, self._code(node)))
