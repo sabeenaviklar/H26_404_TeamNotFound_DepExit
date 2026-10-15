@@ -74,8 +74,8 @@ You need:
 - Optional: [`uv`](https://docs.astral.sh/uv/). DepExit uses it automatically if present, which makes the many virtual environments it creates much faster. Plain `pip` works too.
 
 ```bash
-git clone https://github.com/sabeenaviklar/H26_404_TeamNotFound_xyz
-cd H26_404_TeamNotFound_xyz
+git clone https://github.com/sabeenaviklar/H26_404_TeamNotFound_DepExit
+cd H26_404_TeamNotFound_DepExit
 
 # macOS / Linux
 export GEMINI_API_KEY="your-key"
